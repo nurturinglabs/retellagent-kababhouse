@@ -1,0 +1,68 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files — contains API keys (Resend, Clover, Twilio, Retell)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# PRDs, feature specs, and internal prompts — do not commit
+PRD_*
+prd_*
+FEATURE_SPEC_*
+feature_spec_*
+CLAUDE_CODE_PROMPT_*
+claude_code_prompt_*
+
+# API documentation (may contain endpoint secrets or internal details)
+/docs/
+
+# secrets and credentials
+*.key
+*.cert
+*.p12
+*.pfx
+credentials.*
+secrets.*
+*.secret
+
+# Claude Code internal files
+.claude/
+
+# IDE
+.vscode/
+.idea/
