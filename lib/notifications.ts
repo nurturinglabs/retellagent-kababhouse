@@ -44,9 +44,9 @@ export async function sendOrderConfirmationSMS(
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const fromNumber = process.env.TWILIO_PHONE_NUMBER;
 
-  if (!accountSid || !authToken || !fromNumber) {
-    console.log('[notifications] Missing Twilio environment variables');
-    return { success: false, error: 'Missing Twilio configuration' };
+  if (!accountSid || !authToken || !fromNumber || accountSid === 'your_twilio_sid_here') {
+    console.log('[notifications] Twilio not configured — skipping SMS (email will still be sent)');
+    return { success: false, error: 'Twilio not configured' };
   }
 
   try {
@@ -101,9 +101,9 @@ export async function sendOrderReadySMS(
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const fromNumber = process.env.TWILIO_PHONE_NUMBER;
 
-  if (!accountSid || !authToken || !fromNumber) {
-    console.log('[notifications] Missing Twilio environment variables');
-    return { success: false, error: 'Missing Twilio configuration' };
+  if (!accountSid || !authToken || !fromNumber || accountSid === 'your_twilio_sid_here') {
+    console.log('[notifications] Twilio not configured — skipping SMS (email will still be sent)');
+    return { success: false, error: 'Twilio not configured' };
   }
 
   try {
@@ -153,9 +153,9 @@ export async function sendCateringAlertSMS(
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const fromNumber = process.env.TWILIO_PHONE_NUMBER;
 
-  if (!accountSid || !authToken || !fromNumber) {
-    console.log('[notifications] Missing Twilio environment variables');
-    return { success: false, error: 'Missing Twilio configuration' };
+  if (!accountSid || !authToken || !fromNumber || accountSid === 'your_twilio_sid_here') {
+    console.log('[notifications] Twilio not configured — skipping SMS');
+    return { success: false, error: 'Twilio not configured' };
   }
 
   try {

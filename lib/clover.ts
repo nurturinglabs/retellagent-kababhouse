@@ -2,23 +2,101 @@ import axios from "axios";
 
 const CLOVER_API_BASE = "https://api.clover.com/v3";
 
+// ---------------------------------------------------------------------------
+// Mock Clover POS Store (used when real Clover credentials are not configured)
+// ---------------------------------------------------------------------------
+
+export interface MockCloverOrder {
+  id: string;
+  title: string;
+  note?: string;
+  state: string;
+  createdTime: number;
+  modifiedTime: number;
+  lineItems: {
+    id: string;
+    name: string;
+    price: number; // in cents
+    unitQty: number;
+    note?: string;
+  }[];
+}
+
+const mockCloverOrders: MockCloverOrder[] = [];
+let mockOrderCounter = 1000;
+let mockLineItemCounter = 5000;
+
+function isMockMode(): boolean {
+  const merchantId = process.env.CLOVER_MERCHANT_ID;
+  const accessToken = process.env.CLOVER_ACCESS_TOKEN;
+  return (
+    !merchantId ||
+    !accessToken ||
+    merchantId === "your_merchant_id_here" ||
+    accessToken === "your_clover_access_token_here"
+  );
+}
+
+/** Get all mock Clover orders (for the POS dashboard). */
+export function getMockCloverOrders(): MockCloverOrder[] {
+  return [...mockCloverOrders].reverse(); // newest first
+}
+
+/** Update a mock Clover order's state. */
+export function updateMockCloverOrderState(
+  orderId: string,
+  newState: string
+): MockCloverOrder | null {
+  const order = mockCloverOrders.find((o) => o.id === orderId);
+  if (order) {
+    order.state = newState;
+    order.modifiedTime = Date.now();
+    return order;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Config
+// ---------------------------------------------------------------------------
+
 function getCloverConfig() {
   const merchantId = process.env.CLOVER_MERCHANT_ID;
   const accessToken = process.env.CLOVER_ACCESS_TOKEN;
   if (!merchantId || !accessToken) {
-    console.error('[clover] Missing CLOVER_MERCHANT_ID or CLOVER_ACCESS_TOKEN');
+    console.error("[clover] Missing CLOVER_MERCHANT_ID or CLOVER_ACCESS_TOKEN");
   }
   return { merchantId, accessToken };
 }
 
-/**
- * Create a new order in Clover POS.
- */
+// ---------------------------------------------------------------------------
+// Create Order
+// ---------------------------------------------------------------------------
+
 export async function createCloverOrder(orderData: {
   title: string;
   note?: string;
   state?: string;
 }): Promise<{ id: string } | null> {
+  // ── Mock mode ──────────────────────────────────────────────────────────
+  if (isMockMode()) {
+    const id = `CLV-${++mockOrderCounter}`;
+    const now = Date.now();
+    const mockOrder: MockCloverOrder = {
+      id,
+      title: orderData.title,
+      note: orderData.note,
+      state: "open",
+      createdTime: now,
+      modifiedTime: now,
+      lineItems: [],
+    };
+    mockCloverOrders.push(mockOrder);
+    console.log(`[clover-mock] Created order ${id}: "${orderData.title}"`);
+    return { id };
+  }
+
+  // ── Real Clover API ────────────────────────────────────────────────────
   try {
     const { merchantId, accessToken } = getCloverConfig();
     const url = `${CLOVER_API_BASE}/merchants/${merchantId}/orders`;
@@ -39,24 +117,45 @@ export async function createCloverOrder(orderData: {
     });
 
     console.log("[clover] createCloverOrder - Response status:", response.status);
-    console.log("[clover] createCloverOrder - Response data:", JSON.stringify(response.data, null, 2));
-
     return response.data;
   } catch (error: any) {
     console.error("[clover] createCloverOrder - Error:", error?.message);
-    console.error("[clover] createCloverOrder - Error details:", error?.response?.status, JSON.stringify(error?.response?.data, null, 2));
     return null;
   }
 }
 
-/**
- * Add line items to an existing Clover order.
- * Prices are converted from dollars to cents (Clover uses cents).
- */
+// ---------------------------------------------------------------------------
+// Add Line Items
+// ---------------------------------------------------------------------------
+
 export async function addLineItemsToClover(
   orderId: string,
   items: { name: string; price: number; quantity?: number; note?: string }[]
 ): Promise<boolean> {
+  // ── Mock mode ──────────────────────────────────────────────────────────
+  if (isMockMode()) {
+    const order = mockCloverOrders.find((o) => o.id === orderId);
+    if (!order) {
+      console.error(`[clover-mock] Order ${orderId} not found`);
+      return false;
+    }
+    for (const item of items) {
+      order.lineItems.push({
+        id: `LI-${++mockLineItemCounter}`,
+        name: item.name,
+        price: Math.round(item.price * 100),
+        unitQty: item.quantity || 1,
+        note: item.note,
+      });
+    }
+    order.modifiedTime = Date.now();
+    console.log(
+      `[clover-mock] Added ${items.length} line item(s) to order ${orderId}`
+    );
+    return true;
+  }
+
+  // ── Real Clover API ────────────────────────────────────────────────────
   try {
     const { merchantId, accessToken } = getCloverConfig();
     let allSucceeded = true;
@@ -68,28 +167,17 @@ export async function addLineItemsToClover(
         price: item.price * 100,
         unitQty: item.quantity || 1,
       };
-
-      if (item.note) {
-        body.note = item.note;
-      }
-
-      console.log("[clover] addLineItemsToClover - URL:", url);
-      console.log("[clover] addLineItemsToClover - Adding item:", JSON.stringify(body, null, 2));
+      if (item.note) body.note = item.note;
 
       try {
-        const response = await axios.post(url, body, {
+        await axios.post(url, body, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
         });
-
-        console.log("[clover] addLineItemsToClover - Response status:", response.status);
-        console.log("[clover] addLineItemsToClover - Response data:", JSON.stringify(response.data, null, 2));
       } catch (itemError: any) {
-        console.error("[clover] addLineItemsToClover - Error adding item:", item.name);
-        console.error("[clover] addLineItemsToClover - Error:", itemError?.message);
-        console.error("[clover] addLineItemsToClover - Error details:", itemError?.response?.status, JSON.stringify(itemError?.response?.data, null, 2));
+        console.error("[clover] addLineItemsToClover - Error adding item:", item.name, itemError?.message);
         allSucceeded = false;
       }
     }
@@ -97,22 +185,25 @@ export async function addLineItemsToClover(
     return allSucceeded;
   } catch (error: any) {
     console.error("[clover] addLineItemsToClover - Error:", error?.message);
-    console.error("[clover] addLineItemsToClover - Error details:", error?.response?.status, JSON.stringify(error?.response?.data, null, 2));
     return false;
   }
 }
 
-/**
- * Look up a customer in Clover by phone number.
- */
+// ---------------------------------------------------------------------------
+// Get Customer
+// ---------------------------------------------------------------------------
+
 export async function getCloverCustomer(
   phone: string
 ): Promise<{ id: string; firstName: string; lastName: string } | null> {
+  if (isMockMode()) {
+    console.log(`[clover-mock] Customer lookup for ${phone} — returning null (mock)`);
+    return null;
+  }
+
   try {
     const { merchantId, accessToken } = getCloverConfig();
     const url = `${CLOVER_API_BASE}/merchants/${merchantId}/customers?filter=phoneNumber=${phone}`;
-
-    console.log("[clover] getCloverCustomer - URL:", url);
 
     const response = await axios.get(url, {
       headers: {
@@ -121,44 +212,41 @@ export async function getCloverCustomer(
       },
     });
 
-    console.log("[clover] getCloverCustomer - Response status:", response.status);
-    console.log("[clover] getCloverCustomer - Response data:", JSON.stringify(response.data, null, 2));
-
     const customers = response.data?.elements;
     if (customers && customers.length > 0) {
       const customer = customers[0];
-      console.log("[clover] getCloverCustomer - Found customer:", JSON.stringify(customer, null, 2));
       return {
         id: customer.id,
         firstName: customer.firstName,
         lastName: customer.lastName,
       };
     }
-
-    console.log("[clover] getCloverCustomer - No customer found for phone:", phone);
     return null;
   } catch (error: any) {
     console.error("[clover] getCloverCustomer - Error:", error?.message);
-    console.error("[clover] getCloverCustomer - Error details:", error?.response?.status, JSON.stringify(error?.response?.data, null, 2));
     return null;
   }
 }
 
-/**
- * Create a new customer in Clover.
- */
+// ---------------------------------------------------------------------------
+// Create Customer
+// ---------------------------------------------------------------------------
+
 export async function createCloverCustomer(customerData: {
   firstName: string;
   lastName?: string;
   phoneNumber: string;
   emailAddress?: string;
 }): Promise<{ id: string } | null> {
+  if (isMockMode()) {
+    const id = `CUST-${Date.now()}`;
+    console.log(`[clover-mock] Created mock customer ${id}: ${customerData.firstName}`);
+    return { id };
+  }
+
   try {
     const { merchantId, accessToken } = getCloverConfig();
     const url = `${CLOVER_API_BASE}/merchants/${merchantId}/customers`;
-
-    console.log("[clover] createCloverCustomer - URL:", url);
-    console.log("[clover] createCloverCustomer - Request body:", JSON.stringify(customerData, null, 2));
 
     const response = await axios.post(url, customerData, {
       headers: {
@@ -167,46 +255,45 @@ export async function createCloverCustomer(customerData: {
       },
     });
 
-    console.log("[clover] createCloverCustomer - Response status:", response.status);
-    console.log("[clover] createCloverCustomer - Response data:", JSON.stringify(response.data, null, 2));
-
     return response.data;
   } catch (error: any) {
     console.error("[clover] createCloverCustomer - Error:", error?.message);
-    console.error("[clover] createCloverCustomer - Error details:", error?.response?.status, JSON.stringify(error?.response?.data, null, 2));
     return null;
   }
 }
 
-/**
- * Update the status/state of an existing Clover order.
- */
+// ---------------------------------------------------------------------------
+// Update Order Status
+// ---------------------------------------------------------------------------
+
 export async function updateCloverOrderStatus(
   orderId: string,
   status: string
 ): Promise<boolean> {
+  if (isMockMode()) {
+    const order = updateMockCloverOrderState(orderId, status);
+    if (order) {
+      console.log(`[clover-mock] Updated order ${orderId} state to "${status}"`);
+      return true;
+    }
+    console.error(`[clover-mock] Order ${orderId} not found`);
+    return false;
+  }
+
   try {
     const { merchantId, accessToken } = getCloverConfig();
     const url = `${CLOVER_API_BASE}/merchants/${merchantId}/orders/${orderId}`;
-    const body = { state: status };
 
-    console.log("[clover] updateCloverOrderStatus - URL:", url);
-    console.log("[clover] updateCloverOrderStatus - Request body:", JSON.stringify(body, null, 2));
-
-    const response = await axios.post(url, body, {
+    await axios.post(url, { state: status }, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
     });
 
-    console.log("[clover] updateCloverOrderStatus - Response status:", response.status);
-    console.log("[clover] updateCloverOrderStatus - Response data:", JSON.stringify(response.data, null, 2));
-
     return true;
   } catch (error: any) {
     console.error("[clover] updateCloverOrderStatus - Error:", error?.message);
-    console.error("[clover] updateCloverOrderStatus - Error details:", error?.response?.status, JSON.stringify(error?.response?.data, null, 2));
     return false;
   }
 }

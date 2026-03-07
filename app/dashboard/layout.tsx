@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Truck,
+  Monitor,
   UtensilsCrossed,
   Settings,
   Menu,
@@ -36,6 +37,11 @@ const navItems = [
     label: "Delivery",
     href: "/dashboard/delivery",
     icon: Truck,
+  },
+  {
+    label: "POS",
+    href: "/dashboard/pos",
+    icon: Monitor,
   },
   {
     label: "Menu",
