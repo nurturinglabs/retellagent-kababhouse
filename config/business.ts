@@ -2,7 +2,7 @@ import { BusinessSettings } from '@/lib/types';
 
 export const BUSINESS_CONFIG: BusinessSettings = {
   business_name: 'Kabab House',
-  phone: '+1(262)384-6288',
+  phone: '+1(262)233-1917',
   address: '214 E Ryan Rd, Oak Creek, WI 53154',
   regular_hours: {
     monday: { open: '11:00', close: '21:00', closed: false },
@@ -20,7 +20,7 @@ export const BUSINESS_CONFIG: BusinessSettings = {
   ],
   temporary_closure: { active: false, message: '' },
   default_prep_time: 25,
-  staff_transfer_number: '+1(262)384-6288',
+  staff_transfer_number: '+1(262)233-1917',
   catering_alert_email: undefined,
   sms_enabled: true,
   email_enabled: true,

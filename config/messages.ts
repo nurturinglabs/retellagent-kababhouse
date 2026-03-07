@@ -4,7 +4,7 @@
 
 export const SMS_TEMPLATES = {
   orderConfirmation: (name: string, orderId: string, total: number, pickupTime: string) =>
-    `Hi ${name}! Your Kabab House order #${orderId} for $${total.toFixed(2)} is confirmed. Pickup in ${pickupTime}. Questions? Call (262) 384-6288. Reply STOP to unsubscribe.`,
+    `Hi ${name}! Your Kabab House order #${orderId} for $${total.toFixed(2)} is confirmed. Pickup in ${pickupTime}. Questions? Call (262) 233-1917. Reply STOP to unsubscribe.`,
 
   orderReady: (name: string, orderId: string) =>
     `Hi ${name}! Your Kabab House order #${orderId} is ready for pickup. See you soon! Reply STOP to unsubscribe.`,
@@ -121,7 +121,7 @@ export const EMAIL_TEMPLATES = {
             <td style="background-color:#f9efe4;padding:24px 40px;text-align:center;border-top:1px solid #e8d5c4;">
               <p style="margin:0 0 4px;color:#8b5e3c;font-size:14px;font-weight:600;">Kabab House</p>
               <p style="margin:0 0 4px;color:#a08774;font-size:13px;">214 E Ryan Rd, Oak Creek, WI 53154</p>
-              <p style="margin:0;color:#a08774;font-size:13px;">(262) 384-6288</p>
+              <p style="margin:0;color:#a08774;font-size:13px;">(262) 233-1917</p>
             </td>
           </tr>
         </table>
@@ -241,7 +241,7 @@ export const EMAIL_TEMPLATES = {
             <td style="background-color:#f9efe4;padding:24px 40px;text-align:center;border-top:1px solid #e8d5c4;">
               <p style="margin:0 0 4px;color:#8b5e3c;font-size:14px;font-weight:600;">Kabab House</p>
               <p style="margin:0 0 4px;color:#a08774;font-size:13px;">214 E Ryan Rd, Oak Creek, WI 53154</p>
-              <p style="margin:0;color:#a08774;font-size:13px;">(262) 384-6288</p>
+              <p style="margin:0;color:#a08774;font-size:13px;">(262) 233-1917</p>
             </td>
           </tr>
         </table>

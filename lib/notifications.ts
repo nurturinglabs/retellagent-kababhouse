@@ -55,9 +55,9 @@ export async function sendOrderConfirmationSMS(
 
     let body: string;
     if (orderType === "delivery" && deliveryAddress) {
-      body = `Hi ${customerName}! Your Kabab House delivery order #${orderId} for $${total.toFixed(2)} (incl. $${(deliveryFee ?? 6.99).toFixed(2)} delivery fee) is confirmed. Delivering to: ${deliveryAddress}. Est. delivery: ${estimatedDeliveryTime || "35-45 min"}. Questions? Call (262) 384-6288. Reply STOP to unsubscribe.`;
+      body = `Hi ${customerName}! Your Kabab House delivery order #${orderId} for $${total.toFixed(2)} (incl. $${(deliveryFee ?? 6.99).toFixed(2)} delivery fee) is confirmed. Delivering to: ${deliveryAddress}. Est. delivery: ${estimatedDeliveryTime || "35-45 min"}. Questions? Call (262) 233-1917. Reply STOP to unsubscribe.`;
     } else {
-      body = `Hi ${customerName}! Your Kabab House order #${orderId} for $${total.toFixed(2)} is confirmed. Pickup in ${pickupTime}. Questions? Call (262) 384-6288. Reply STOP to unsubscribe.`;
+      body = `Hi ${customerName}! Your Kabab House order #${orderId} for $${total.toFixed(2)} is confirmed. Pickup in ${pickupTime}. Questions? Call (262) 233-1917. Reply STOP to unsubscribe.`;
     }
 
     const message = await client.messages.create({
@@ -301,7 +301,7 @@ export async function sendOrderReceiptEmail(
               <p style="margin: 0 0 8px; font-size: 18px; font-weight: 700; color: #b91c1c; text-align: right;">Total: $${total.toFixed(2)}</p>
               <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
               ${readyLine}
-              <p style="margin: 0 0 0; font-size: 14px; color: #555;">Questions? Call <a href="tel:+12623846288" style="color: #b91c1c; text-decoration: none;">(262) 384-6288</a></p>
+              <p style="margin: 0 0 0; font-size: 14px; color: #555;">Questions? Call <a href="tel:+12623846288" style="color: #b91c1c; text-decoration: none;">(262) 233-1917</a></p>
             </td>
           </tr>
           <!-- Footer -->

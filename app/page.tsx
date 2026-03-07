@@ -17,8 +17,8 @@ import {
   Star,
 } from "lucide-react";
 
-const PHONE_NUMBER = "(262) 384-6288";
-const PHONE_LINK = "tel:+12623846288";
+const PHONE_NUMBER = "(262) 233-1917";
+const PHONE_LINK = "tel:+12622331917";
 
 function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -54,6 +54,12 @@ function Header() {
               className="text-[#3d2b1f] hover:text-[#c2571a] transition-colors font-medium"
             >
               FAQ
+            </a>
+            <a
+              href="/dashboard"
+              className="text-[#3d2b1f] hover:text-[#c2571a] transition-colors font-medium"
+            >
+              Dashboard
             </a>
             <a
               href={PHONE_LINK}
@@ -102,6 +108,13 @@ function Header() {
                 className="text-[#3d2b1f] hover:text-[#c2571a] hover:bg-[#fdf6ee] transition-colors font-medium py-3 px-4 rounded-lg"
               >
                 FAQ
+              </a>
+              <a
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#3d2b1f] hover:text-[#c2571a] hover:bg-[#fdf6ee] transition-colors font-medium py-3 px-4 rounded-lg"
+              >
+                Dashboard
               </a>
               <a
                 href={PHONE_LINK}
@@ -418,7 +431,7 @@ const faqItems = [
   {
     question: "How does the phone ordering work?",
     answer:
-      "When you call our ordering line at (262) 384-6288, you'll be greeted by our friendly AI assistant. It will walk you through our menu, help you customize your order, and confirm everything before placing it. It's like talking to a real person — fast, easy, and accurate.",
+      "When you call our ordering line at (262) 233-1917, you'll be greeted by our friendly AI assistant. It will walk you through our menu, help you customize your order, and confirm everything before placing it. It's like talking to a real person — fast, easy, and accurate.",
   },
   {
     question: "Is the food halal?",
@@ -578,38 +591,54 @@ function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-white font-semibold mb-4">Dashboard</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <a
-                  href="#menu"
-                  className="hover:text-white transition-colors"
-                >
-                  Menu
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#how-it-works"
-                  className="hover:text-white transition-colors"
-                >
-                  How It Works
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#faq"
-                  className="hover:text-white transition-colors"
-                >
-                  FAQ
-                </a>
-              </li>
-              <li>
-                <a
                   href="/dashboard"
-                  className="text-[#8a7a6a] hover:text-[#c4b4a0] transition-colors text-xs"
+                  className="hover:text-white transition-colors"
                 >
-                  Staff Dashboard
+                  Overview
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/dashboard/orders"
+                  className="hover:text-white transition-colors"
+                >
+                  Orders
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/dashboard/delivery"
+                  className="hover:text-white transition-colors"
+                >
+                  Delivery
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/dashboard/pos"
+                  className="hover:text-white transition-colors"
+                >
+                  POS (Kitchen Display)
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/dashboard/menu"
+                  className="hover:text-white transition-colors"
+                >
+                  Menu Management
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/dashboard/settings"
+                  className="hover:text-white transition-colors"
+                >
+                  Settings
                 </a>
               </li>
             </ul>
