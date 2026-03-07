@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
                 // Get or create customer
                 const customerName = orderData.customerName || "Voice Order Customer";
                 const customerPhone = orderData.customerPhone || "unknown";
-                const customer = getOrCreateCustomer(customerPhone, customerName);
+                const customer = await getOrCreateCustomer(customerPhone, customerName);
                 log("Customer resolved for voice order", {
                   id: customer.id,
                   phone: customer.phone,
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
                 });
 
                 // Add order to local store
-                const order = addOrder({
+                const order = await addOrder({
                   customer_name: customerName,
                   customer_phone: customerPhone,
                   order_type: "pickup",
@@ -231,7 +231,7 @@ export async function POST(request: NextRequest) {
             const topic = extractInquiryTopic(transcript);
             log(`Call ${call_id}: inquiry topic = "${topic}"`);
 
-            addCallLog({
+            await addCallLog({
               call_id,
               call_type: "inquiry",
               duration_seconds: durationSeconds,
@@ -274,7 +274,7 @@ export async function POST(request: NextRequest) {
             });
 
             // Add catering lead to store
-            const lead = addCateringLead({
+            const lead = await addCateringLead({
               name: leadName,
               phone: leadPhone,
               event_date: eventDate,
@@ -318,7 +318,7 @@ export async function POST(request: NextRequest) {
             }
 
             // Log the catering call
-            addCallLog({
+            await addCallLog({
               call_id,
               call_type: "catering",
               duration_seconds: durationSeconds,
@@ -334,7 +334,7 @@ export async function POST(request: NextRequest) {
         // ── TRANSFER ──────────────────────────────────────────────────
         if (callType === "transfer") {
           try {
-            addCallLog({
+            await addCallLog({
               call_id,
               call_type: "transfer",
               duration_seconds: durationSeconds,
@@ -350,7 +350,7 @@ export async function POST(request: NextRequest) {
         // ── Catch-all: log for any call type (order logs handled inline) ──
         if (callType === "order") {
           try {
-            addCallLog({
+            await addCallLog({
               call_id,
               call_type: "order",
               duration_seconds: durationSeconds,
@@ -366,7 +366,7 @@ export async function POST(request: NextRequest) {
 
         if (callType === "other") {
           try {
-            addCallLog({
+            await addCallLog({
               call_id,
               call_type: "other",
               duration_seconds: durationSeconds,

@@ -11,12 +11,12 @@ import {
 } from "@/lib/store";
 
 export async function GET() {
-  const orders = getAllOrders();
-  const todayOrders = getTodayOrders();
-  const callStats = getCallStats();
-  const callLogs = getCallLogs();
-  const cateringLeads = getCateringLeads();
-  const customers = getAllCustomers();
+  const orders = await getAllOrders();
+  const todayOrders = await getTodayOrders();
+  const callStats = await getCallStats();
+  const callLogs = await getCallLogs();
+  const cateringLeads = await getCateringLeads();
+  const customers = await getAllCustomers();
 
   // Total revenue across all orders
   const totalRevenue = orders.reduce((sum, o) => sum + (o.order_total || 0), 0);
@@ -137,8 +137,8 @@ export async function GET() {
     avgOrderValue,
     totalCalls: allCallLogs.length,
     todayOrders: todayOrders.length,
-    todayRevenue: getTodayRevenue(),
-    todayAvgOrderValue: getAverageOrderValue(),
+    todayRevenue: await getTodayRevenue(),
+    todayAvgOrderValue: await getAverageOrderValue(),
     todayCallStats: callStats,
     totalCustomers: customers.length,
     ordersByHour,

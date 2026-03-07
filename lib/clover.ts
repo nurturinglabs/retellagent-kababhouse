@@ -1,4 +1,5 @@
 import axios from "axios";
+import { kvGet, kvSet, kvIncr } from "@/lib/kv";
 
 const CLOVER_API_BASE = "https://api.clover.com/v3";
 
@@ -22,9 +23,9 @@ export interface MockCloverOrder {
   }[];
 }
 
-const mockCloverOrders: MockCloverOrder[] = [];
-let mockOrderCounter = 1000;
-let mockLineItemCounter = 5000;
+const KV_CLOVER_ORDERS = "kh:clover_orders";
+const KV_CLOVER_ORDER_CTR = "kh:clover_order_counter";
+const KV_CLOVER_LI_CTR = "kh:clover_li_counter";
 
 function isMockMode(): boolean {
   const merchantId = process.env.CLOVER_MERCHANT_ID;
@@ -37,20 +38,32 @@ function isMockMode(): boolean {
   );
 }
 
+async function getMockOrders(): Promise<MockCloverOrder[]> {
+  const data = await kvGet<MockCloverOrder[]>(KV_CLOVER_ORDERS);
+  return data ?? [];
+}
+
+async function saveMockOrders(orders: MockCloverOrder[]): Promise<void> {
+  await kvSet(KV_CLOVER_ORDERS, orders);
+}
+
 /** Get all mock Clover orders (for the POS dashboard). */
-export function getMockCloverOrders(): MockCloverOrder[] {
-  return [...mockCloverOrders].reverse(); // newest first
+export async function getMockCloverOrders(): Promise<MockCloverOrder[]> {
+  const orders = await getMockOrders();
+  return [...orders].reverse(); // newest first
 }
 
 /** Update a mock Clover order's state. */
-export function updateMockCloverOrderState(
+export async function updateMockCloverOrderState(
   orderId: string,
   newState: string
-): MockCloverOrder | null {
-  const order = mockCloverOrders.find((o) => o.id === orderId);
+): Promise<MockCloverOrder | null> {
+  const orders = await getMockOrders();
+  const order = orders.find((o) => o.id === orderId);
   if (order) {
     order.state = newState;
     order.modifiedTime = Date.now();
+    await saveMockOrders(orders);
     return order;
   }
   return null;
@@ -80,7 +93,8 @@ export async function createCloverOrder(orderData: {
 }): Promise<{ id: string } | null> {
   // ── Mock mode ──────────────────────────────────────────────────────────
   if (isMockMode()) {
-    const id = `CLV-${++mockOrderCounter}`;
+    const counter = await kvIncr(KV_CLOVER_ORDER_CTR);
+    const id = `CLV-${1000 + counter}`;
     const now = Date.now();
     const mockOrder: MockCloverOrder = {
       id,
@@ -91,7 +105,9 @@ export async function createCloverOrder(orderData: {
       modifiedTime: now,
       lineItems: [],
     };
-    mockCloverOrders.push(mockOrder);
+    const orders = await getMockOrders();
+    orders.push(mockOrder);
+    await saveMockOrders(orders);
     console.log(`[clover-mock] Created order ${id}: "${orderData.title}"`);
     return { id };
   }
@@ -107,7 +123,6 @@ export async function createCloverOrder(orderData: {
     };
 
     console.log("[clover] createCloverOrder - URL:", url);
-    console.log("[clover] createCloverOrder - Request body:", JSON.stringify(body, null, 2));
 
     const response = await axios.post(url, body, {
       headers: {
@@ -134,14 +149,16 @@ export async function addLineItemsToClover(
 ): Promise<boolean> {
   // ── Mock mode ──────────────────────────────────────────────────────────
   if (isMockMode()) {
-    const order = mockCloverOrders.find((o) => o.id === orderId);
+    const orders = await getMockOrders();
+    const order = orders.find((o) => o.id === orderId);
     if (!order) {
       console.error(`[clover-mock] Order ${orderId} not found`);
       return false;
     }
     for (const item of items) {
+      const liCounter = await kvIncr(KV_CLOVER_LI_CTR);
       order.lineItems.push({
-        id: `LI-${++mockLineItemCounter}`,
+        id: `LI-${5000 + liCounter}`,
         name: item.name,
         price: Math.round(item.price * 100),
         unitQty: item.quantity || 1,
@@ -149,6 +166,7 @@ export async function addLineItemsToClover(
       });
     }
     order.modifiedTime = Date.now();
+    await saveMockOrders(orders);
     console.log(
       `[clover-mock] Added ${items.length} line item(s) to order ${orderId}`
     );
@@ -271,7 +289,7 @@ export async function updateCloverOrderStatus(
   status: string
 ): Promise<boolean> {
   if (isMockMode()) {
-    const order = updateMockCloverOrderState(orderId, status);
+    const order = await updateMockCloverOrderState(orderId, status);
     if (order) {
       console.log(`[clover-mock] Updated order ${orderId} state to "${status}"`);
       return true;

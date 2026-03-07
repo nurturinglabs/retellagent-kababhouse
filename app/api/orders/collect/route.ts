@@ -110,11 +110,11 @@ export async function POST(request: NextRequest) {
     log("Order total", { provided: body.order_total, foodTotal, deliveryFee, calculated: calculatedTotal, final: orderTotal });
 
     // ── Get or create customer ─────────────────────────────────────
-    const customer = getOrCreateCustomer(customer_phone, customer_name);
+    const customer = await getOrCreateCustomer(customer_phone, customer_name);
     log("Customer resolved", { id: customer.id, phone: customer.phone, name: customer.name });
 
     // ── Create the order ───────────────────────────────────────────
-    const order = addOrder({
+    const order = await addOrder({
       customer_name,
       customer_phone,
       order_type: body.order_type || "pickup",

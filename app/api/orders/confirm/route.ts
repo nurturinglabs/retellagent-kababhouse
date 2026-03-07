@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addOrder, getOrCreateCustomer, updateOrderStatus } from "@/lib/store";
+import { addOrder, getOrCreateCustomer, updateOrder } from "@/lib/store";
 import { getMenuItem } from "@/lib/menu";
 import { createCloverOrder, addLineItemsToClover } from "@/lib/clover";
 import { sendOrderConfirmationSMS, sendOrderReceiptEmail } from "@/lib/notifications";
@@ -96,13 +96,13 @@ export async function POST(request: NextRequest) {
     const calculatedTotal = total_price ?? Math.round((foodTotal + deliveryFee) * 100) / 100;
 
     // ── Get or create customer ────────────────────────────────────────
-    const customer = getOrCreateCustomer(customer_phone, customer_name);
+    const customer = await getOrCreateCustomer(customer_phone, customer_name);
     log("Customer resolved", { id: customer.id, phone: customer.phone });
 
     // ── Create order in store with status "confirmed" ─────────────────
     const pickupTime = `${BUSINESS_CONFIG.default_prep_time} minutes`;
 
-    const order = addOrder({
+    const order = await addOrder({
       customer_name,
       customer_phone,
       customer_email,
@@ -150,10 +150,10 @@ export async function POST(request: NextRequest) {
         log("Clover addLineItemsToClover result", { success: lineItemResult });
 
         // Update order with Clover order ID
-        const updatedOrder = updateOrderStatus(order.id, "confirmed");
-        if (updatedOrder) {
-          (updatedOrder as any).clover_order_id = cloverOrderId;
-        }
+        await updateOrder(order.id, {
+          order_status: "confirmed",
+          clover_order_id: cloverOrderId,
+        });
 
         log("Order updated with clover_order_id", { order_id: order.id, clover_order_id: cloverOrderId });
       }

@@ -8,7 +8,7 @@ import {
  * GET — Return all mock Clover POS orders (kitchen display).
  */
 export async function GET() {
-  const orders = getMockCloverOrders();
+  const orders = await getMockCloverOrders();
 
   return NextResponse.json({
     mock_mode: true,
@@ -43,7 +43,7 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
-  const updated = updateMockCloverOrderState(order_id, state);
+  const updated = await updateMockCloverOrderState(order_id, state);
 
   if (!updated) {
     return NextResponse.json(

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getOrder } from "@/lib/store";
+import { getOrder, updateOrder } from "@/lib/store";
 import { log, logError } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     log("POST /api/orders/dispatch - Dispatching order", { order_id });
 
-    const order = getOrder(order_id);
+    const order = await getOrder(order_id);
 
     if (!order) {
       return NextResponse.json(
@@ -42,15 +42,16 @@ export async function POST(request: NextRequest) {
     // Mock Uber Direct dispatch — generate a fake uber_direct_id
     const mockUberDirectId = `ud_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-    order.delivery_status = "dispatched";
-    order.uber_direct_id = mockUberDirectId;
-    order.order_status = "preparing";
-    order.updated_at = new Date();
+    await updateOrder(order_id, {
+      delivery_status: "dispatched",
+      uber_direct_id: mockUberDirectId,
+      order_status: "preparing",
+    });
 
     log("Order dispatched via Uber Direct (mock)", {
       order_id: order.id,
       uber_direct_id: mockUberDirectId,
-      delivery_status: order.delivery_status,
+      delivery_status: "dispatched",
     });
 
     return NextResponse.json({

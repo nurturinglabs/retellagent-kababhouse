@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { getAllOrders, getTodayOrders } from "@/lib/store";
 
 export async function GET() {
-  const allOrders = getAllOrders();
+  const allOrders = await getAllOrders();
   const deliveryOrders = allOrders.filter((o) => o.order_type === "delivery");
 
-  const todayOrders = getTodayOrders();
+  const todayOrders = await getTodayOrders();
   const todayDelivery = todayOrders.filter((o) => o.order_type === "delivery");
 
   const todayFoodTotal = todayDelivery.reduce((sum, o) => {
