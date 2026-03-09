@@ -64,24 +64,24 @@ function MenuCol({
 }) {
   return (
     <div className="flex flex-col min-w-0">
-      <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-orange-400/70 mb-3 lg:mb-5">
+      <h2 className="text-[10px] font-semibold tracking-[0.2em] uppercase text-orange-400/70 mb-2">
         {title}
       </h2>
-      <div className="flex flex-col gap-0">
+      <div className="flex flex-col">
         {items.map((item, i) => (
           <div
             key={i}
-            className="flex items-baseline justify-between gap-3 py-2 border-b border-white/[0.03] last:border-0"
+            className="flex items-baseline justify-between gap-2 py-[5px] border-b border-white/[0.03] last:border-0"
           >
-            <span className="text-[15px] text-zinc-300 truncate leading-snug">
+            <span className="text-[13px] text-zinc-300 truncate leading-tight">
               {item.name}
               {item.tag && (
-                <span className="ml-2 text-[10px] font-semibold tracking-wider uppercase text-orange-400/50">
+                <span className="ml-1.5 text-[9px] font-semibold tracking-wider uppercase text-orange-400/50">
                   {item.tag}
                 </span>
               )}
             </span>
-            <span className="text-sm text-zinc-500 tabular-nums shrink-0">
+            <span className="text-[12px] text-zinc-500 tabular-nums shrink-0">
               {item.price.toFixed(2)}
             </span>
           </div>
@@ -99,10 +99,10 @@ export default function Home() {
   const [mobileNav, setMobileNav] = useState(false);
 
   return (
-    <div className="h-screen flex flex-col bg-[#060606] overflow-auto lg:overflow-hidden">
+    <div className="h-screen flex flex-col bg-[#060606] overflow-hidden">
       {/* ── Top bar ─────────────────────────────────────────────────────── */}
       <header className="shrink-0 border-b border-white/[0.05]">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
           {/* Brand */}
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center">
@@ -120,7 +120,7 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Desktop: phone CTA + links */}
+          {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-5">
             <div className="flex items-center gap-4 text-xs text-zinc-600">
               <a href="/dashboard" className="hover:text-zinc-300 transition-colors">Dashboard</a>
@@ -133,7 +133,7 @@ export default function Home() {
             <div className="w-px h-5 bg-white/[0.06]" />
             <a
               href={PHONE_LINK}
-              className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium pl-3.5 pr-4 py-2 rounded-lg transition-all"
+              className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium pl-3.5 pr-4 py-1.5 rounded-lg transition-all"
             >
               <Phone className="h-3 w-3" />
               {PHONE_NUMBER}
@@ -176,105 +176,108 @@ export default function Home() {
         )}
       </header>
 
-      {/* ── Main content: fills remaining space ────────────────────────── */}
-      <main className="flex-1 min-h-0">
-        <div className="h-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
-          <div className="h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr,1fr,1fr,300px] gap-6 lg:gap-8">
+      {/* ── Main: two-panel split ───────────────────────────────────────── */}
+      <main className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-auto lg:overflow-hidden">
 
+        {/* ── LEFT PANEL: Restaurant Story & CTA ──────────────────────── */}
+        <div className="lg:w-[45%] xl:w-[42%] shrink-0 flex flex-col justify-center px-6 sm:px-10 lg:px-14 xl:px-20 py-8 lg:py-0 border-b lg:border-b-0 lg:border-r border-white/[0.05]">
+          {/* Tagline */}
+          <p className="text-[10px] font-semibold tracking-[0.25em] uppercase text-orange-400/60 mb-4">
+            Authentic Middle Eastern Cuisine
+          </p>
+
+          {/* Restaurant name */}
+          <h1 className="text-4xl sm:text-5xl lg:text-[3.2rem] xl:text-[3.5rem] font-bold text-white tracking-tight leading-[1.1] mb-3">
+            Kabab<br />House
+          </h1>
+
+          {/* About */}
+          <p className="text-sm sm:text-[15px] text-zinc-400 leading-relaxed max-w-md mb-6">
+            Family-owned restaurant in Oak Creek, WI. Serving the finest shawarma, kabobs, and Middle Eastern classics — made fresh daily.
+          </p>
+
+          {/* Halal badge */}
+          <div className="flex items-center gap-2 mb-6">
+            <ShieldCheck className="h-4 w-4 text-orange-400/70" />
+            <span className="text-xs font-medium text-zinc-300 tracking-wide">
+              100% Zabiha Halal Certified
+            </span>
+          </div>
+
+          {/* Call to order CTA */}
+          <a
+            href={PHONE_LINK}
+            className="group inline-flex items-center gap-3 bg-orange-600 hover:bg-orange-500 transition-all rounded-xl px-6 py-4 mb-6 w-fit shadow-lg shadow-orange-600/15"
+          >
+            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-white/15 shrink-0">
+              <Phone className="h-5 w-5 text-white" />
+            </span>
+            <div>
+              <div className="text-lg font-semibold text-white tracking-tight">
+                {PHONE_NUMBER}
+              </div>
+              <div className="text-[11px] text-orange-200/70 uppercase tracking-wider">
+                Call to order — AI answers 24/7
+              </div>
+            </div>
+          </a>
+
+          {/* Info row */}
+          <div className="flex flex-wrap gap-x-6 gap-y-3 text-[12px] text-zinc-500 mb-5">
+            <div className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5 text-zinc-600" />
+              <span>Mon-Sat 11a-9p <span className="text-zinc-700">/</span> Sun 12p-8p</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5 text-zinc-600" />
+              <span>214 E Ryan Rd, Oak Creek, WI</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Truck className="h-3.5 w-3.5 text-zinc-600" />
+              <span>Delivery available</span>
+            </div>
+          </div>
+
+          {/* How it works */}
+          <div className="border-t border-white/[0.04] pt-4">
+            <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-zinc-600 mb-2.5">
+              How it works
+            </p>
+            <div className="flex gap-6 text-[12px] text-zinc-500">
+              <div className="flex gap-1.5 items-baseline">
+                <span className="text-orange-400/50 font-semibold text-[11px]">1</span>
+                <span>Call anytime</span>
+              </div>
+              <div className="flex gap-1.5 items-baseline">
+                <span className="text-orange-400/50 font-semibold text-[11px]">2</span>
+                <span>Order by voice</span>
+              </div>
+              <div className="flex gap-1.5 items-baseline">
+                <span className="text-orange-400/50 font-semibold text-[11px]">3</span>
+                <span>Pick up in ~20 min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── RIGHT PANEL: Menu ───────────────────────────────────────── */}
+        <div className="flex-1 flex flex-col justify-center px-6 sm:px-10 lg:px-12 xl:px-16 py-8 lg:py-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 xl:gap-x-10 gap-y-6">
             {/* Col 1: Plates */}
             <MenuCol title="Plates" items={plates} />
 
             {/* Col 2: Wraps */}
             <MenuCol title="Sandwiches & Wraps" items={wraps} />
 
-            {/* Col 3: Sides */}
+            {/* Col 3: Sides & Desserts */}
             <MenuCol title="Sides & Desserts" items={sides} />
-
-            {/* Col 4: Info panel */}
-            <div className="flex flex-col gap-0 lg:border-l lg:border-white/[0.04] lg:pl-8">
-              {/* Call to order — primary action */}
-              <div className="mb-5 lg:mb-6">
-                <a
-                  href={PHONE_LINK}
-                  className="group flex items-center gap-3"
-                >
-                  <span className="flex items-center justify-center w-11 h-11 rounded-full bg-orange-600 group-hover:bg-orange-500 transition-colors shadow-lg shadow-orange-600/20 shrink-0">
-                    <Phone className="h-5 w-5 text-white" />
-                  </span>
-                  <div>
-                    <div className="text-xl font-semibold text-white group-hover:text-orange-300 transition-colors tracking-tight">
-                      {PHONE_NUMBER}
-                    </div>
-                    <div className="text-xs text-zinc-500 tracking-wide uppercase">
-                      Call to order
-                    </div>
-                  </div>
-                </a>
-              </div>
-
-              {/* Info items */}
-              <div className="flex flex-col gap-4 text-sm text-zinc-400 leading-relaxed">
-                <div className="flex gap-3">
-                  <ShieldCheck className="h-4 w-4 text-zinc-600 mt-0.5 shrink-0" />
-                  <span>
-                    <span className="text-zinc-200">100% Zabiha Halal</span> — all meats certified
-                  </span>
-                </div>
-
-                <div className="flex gap-3">
-                  <Clock className="h-4 w-4 text-zinc-600 mt-0.5 shrink-0" />
-                  <span>
-                    <span className="text-zinc-200">Mon-Sat</span> 11a-9p{" "}
-                    <span className="text-zinc-600 mx-0.5">/</span>{" "}
-                    <span className="text-zinc-200">Sun</span> 12p-8p
-                    <br />
-                    <span className="text-orange-400/60 text-xs">Phone orders 24/7</span>
-                  </span>
-                </div>
-
-                <div className="flex gap-3">
-                  <MapPin className="h-4 w-4 text-zinc-600 mt-0.5 shrink-0" />
-                  <span>
-                    214 E Ryan Rd
-                    <br />
-                    Oak Creek, WI 53154
-                  </span>
-                </div>
-
-                <div className="flex gap-3">
-                  <Truck className="h-4 w-4 text-zinc-600 mt-0.5 shrink-0" />
-                  <span>Delivery available — just ask when you call</span>
-                </div>
-              </div>
-
-              {/* How it works — ultra compact */}
-              <div className="mt-5 lg:mt-auto pt-4 border-t border-white/[0.04]">
-                <p className="text-xs font-semibold tracking-[0.2em] uppercase text-zinc-600 mb-3">
-                  How it works
-                </p>
-                <div className="flex flex-col gap-2 text-sm text-zinc-500">
-                  <div className="flex gap-2.5 items-baseline">
-                    <span className="text-orange-400/50 font-semibold text-xs">1</span>
-                    <span>Call us anytime — AI answers instantly</span>
-                  </div>
-                  <div className="flex gap-2.5 items-baseline">
-                    <span className="text-orange-400/50 font-semibold text-xs">2</span>
-                    <span>Order naturally by voice</span>
-                  </div>
-                  <div className="flex gap-2.5 items-baseline">
-                    <span className="text-orange-400/50 font-semibold text-xs">3</span>
-                    <span>Pick up in ~20 minutes</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </main>
 
-      {/* ── Bottom bar ──────────────────────────────────────────────────── */}
+      {/* ── Footer ──────────────────────────────────────────────────────── */}
       <footer className="shrink-0 border-t border-white/[0.04] px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1400px] mx-auto h-10 flex items-center justify-between text-xs text-zinc-700">
+        <div className="max-w-[1400px] mx-auto h-9 flex items-center justify-between text-[11px] text-zinc-700">
           <span>&copy; 2026 Kabab House</span>
           <span>Authentic Middle Eastern Cuisine — Oak Creek, WI</span>
         </div>
