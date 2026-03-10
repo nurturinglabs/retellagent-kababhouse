@@ -129,6 +129,7 @@ export default function Home() {
               <a href="/dashboard/delivery" className="hover:text-zinc-300 transition-colors">Delivery</a>
               <a href="/dashboard/menu" className="hover:text-zinc-300 transition-colors">Menu Mgmt</a>
               <a href="/dashboard/settings" className="hover:text-zinc-300 transition-colors">Settings</a>
+              <a href="/pitch" className="hover:text-zinc-300 transition-colors">Pitch</a>
             </div>
             <div className="w-px h-5 bg-white/[0.06]" />
             <a
@@ -169,6 +170,7 @@ export default function Home() {
               { l: "Delivery", h: "/dashboard/delivery" },
               { l: "Menu Mgmt", h: "/dashboard/menu" },
               { l: "Settings", h: "/dashboard/settings" },
+              { l: "Pitch", h: "/pitch" },
             ].map((lk) => (
               <a key={lk.l} href={lk.h} className="text-zinc-500 hover:text-white transition-colors">{lk.l}</a>
             ))}

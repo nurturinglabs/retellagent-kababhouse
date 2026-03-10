@@ -11,6 +11,7 @@ import {
   UtensilsCrossed,
   Settings,
   Menu,
+  Presentation,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,6 +53,11 @@ const navItems = [
     label: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
+  },
+  {
+    label: "Pitch",
+    href: "/pitch",
+    icon: Presentation,
   },
 ];
 
