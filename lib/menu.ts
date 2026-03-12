@@ -357,9 +357,141 @@ export const MENU_ITEMS: Record<string, MenuItem[]> = {
  * Search for a menu item by name (case-insensitive with partial matching).
  * For example, "beef shawarma" will match "Beef Shawarma Plate".
  */
+// Common spoken aliases → canonical menu item name or id.
+// Covers alternate spellings, abbreviations, and casual phrasing customers
+// are likely to use over the phone.
+const ALIASES: Record<string, string> = {
+  // ── Fries ───────────────────────────────────────────────────────────────
+  "french fries": "fries (small)",
+  "french fry": "fries (small)",
+  "fries": "fries (small)",
+  "small fries": "fries (small)",
+  "small french fries": "fries (small)",
+  "large fries": "fries (large)",
+  "large french fries": "fries (large)",
+  "big fries": "fries (large)",
+
+  // ── Rice ────────────────────────────────────────────────────────────────
+  "rice": "rice (side)",
+  "side of rice": "rice (side)",
+  "side rice": "rice (side)",
+  "jasmine rice": "rice (side)",
+  "white rice": "rice (side)",
+
+  // ── Sauces ──────────────────────────────────────────────────────────────
+  "tahini": "tahini sauce (container)",
+  "tahini sauce": "tahini sauce (container)",
+  "garlic sauce": "garlic sauce (container)",
+  "garlic dip": "garlic sauce (container)",
+  "toum": "garlic sauce (container)",
+
+  // ── Shawarma spelling variants ──────────────────────────────────────────
+  "beef shawarma": "beef shawarma plate",
+  "chicken shawarma": "chicken shawarma plate",
+  "beef shwarma": "beef shawarma plate",
+  "chicken shwarma": "chicken shawarma plate",
+  "arabi shawarma": "arabi beef shawarma plate",
+  "arabi beef": "arabi beef shawarma plate",
+  "arabi beef shawarma": "arabi beef shawarma plate",
+
+  // ── Kabob / kebab spelling variants ─────────────────────────────────────
+  "beef kebab": "beef shish kabob plate",
+  "beef kebab plate": "beef shish kabob plate",
+  "beef kabob": "beef shish kabob plate",
+  "shish kebab": "beef shish kabob plate",
+  "shish kabob": "beef shish kabob plate",
+  "beef shish kebab": "beef shish kabob plate",
+  "lamb kebab": "lamb kabob plate",
+  "lamb kebab plate": "lamb kabob plate",
+  "lamb kabob": "lamb kabob plate",
+  "beef kebab sandwich": "beef shish kabob sandwich",
+  "beef kabob sandwich": "beef shish kabob sandwich",
+  "shish kebab sandwich": "beef shish kabob sandwich",
+  "lamb kebab sandwich": "lamb kabob sandwich",
+  "lamb kabob sandwich": "lamb kabob sandwich",
+
+  // ── Tawook / taouk / tavuk ─────────────────────────────────────────────
+  "chicken taouk": "chicken tawook plate",
+  "chicken taouk plate": "chicken tawook plate",
+  "chicken tavuk": "chicken tawook plate",
+  "tawook": "chicken tawook plate",
+  "taouk": "chicken tawook plate",
+  "tawook plate": "chicken tawook plate",
+  "chicken taouk sandwich": "chicken tawook sandwich",
+  "chicken tavuk sandwich": "chicken tawook sandwich",
+  "tawook sandwich": "chicken tawook sandwich",
+
+  // ── Kofta / kafta / kofte ──────────────────────────────────────────────
+  "chicken kafta": "chicken kofta plate",
+  "chicken kafta plate": "chicken kofta plate",
+  "chicken kofte": "chicken kofta plate",
+  "kofta": "chicken kofta plate",
+  "kafta": "chicken kofta plate",
+  "kofte": "chicken kofta plate",
+  "kofta plate": "chicken kofta plate",
+  "chicken kafta sandwich": "chicken kofta sandwich",
+  "chicken kofte sandwich": "chicken kofta sandwich",
+  "kofta sandwich": "chicken kofta sandwich",
+  "kafta sandwich": "chicken kofta sandwich",
+
+  // ── Mix(ed) Grill ──────────────────────────────────────────────────────
+  "mixed grill": "mix grill plate",
+  "mixed grill plate": "mix grill plate",
+  "mix grill": "mix grill plate",
+  "combo plate": "mix grill plate",
+  "combo grill": "mix grill plate",
+
+  // ── Vegetarian ─────────────────────────────────────────────────────────
+  "veggie plate": "vegetarian plate",
+  "veg plate": "vegetarian plate",
+  "vegetable plate": "vegetarian plate",
+
+  // ── Falafel ────────────────────────────────────────────────────────────
+  "falafel": "falafel (12 pieces)",
+  "falafels": "falafel (12 pieces)",
+  "falafel pieces": "falafel (12 pieces)",
+  "falafel wrap": "falafel sandwich",
+
+  // ── Kubbeh / kibbeh ────────────────────────────────────────────────────
+  "kubbeh": "kubbeh (1 piece)",
+  "kibbeh": "kubbeh (1 piece)",
+  "kibbe": "kubbeh (1 piece)",
+  "kubba": "kubbeh (1 piece)",
+
+  // ── Baba Ghanoush spelling variants ────────────────────────────────────
+  "baba ganoush": "baba ghanoush",
+  "baba ganush": "baba ghanoush",
+  "babaganoush": "baba ghanoush",
+  "baba ghanouj": "baba ghanoush",
+
+  // ── Tabbouleh spelling variants ────────────────────────────────────────
+  "tabouli": "tabbouleh salad",
+  "tabouleh": "tabbouleh salad",
+  "taboule": "tabbouleh salad",
+  "tabbouleh": "tabbouleh salad",
+
+  // ── Hummus ─────────────────────────────────────────────────────────────
+  "hummus dip": "hummus",
+  "hommus": "hummus",
+  "humus": "hummus",
+
+  // ── Wrap → Sandwich alias ──────────────────────────────────────────────
+  "beef shawarma wrap": "beef shawarma sandwich",
+  "chicken shawarma wrap": "chicken shawarma sandwich",
+  "chicken tawook wrap": "chicken tawook sandwich",
+  "lamb kabob wrap": "lamb kabob sandwich",
+  "beef kabob wrap": "beef shish kabob sandwich",
+  "chicken kofta wrap": "chicken kofta sandwich",
+};
+
 export function getMenuItem(name: string): MenuItem | undefined {
   const allItems = getAllItems();
-  const searchTerm = name.toLowerCase().trim();
+  let searchTerm = name.toLowerCase().trim();
+
+  // Check aliases first — map common spoken names to canonical names
+  if (ALIASES[searchTerm]) {
+    searchTerm = ALIASES[searchTerm];
+  }
 
   // Try exact match first (case-insensitive)
   const exactMatch = allItems.find(
@@ -392,6 +524,17 @@ export function getMenuItem(name: string): MenuItem | undefined {
     );
   });
   if (reversePartialMatch) return reversePartialMatch;
+
+  // Try alias-style match: strip common prefixes and try again
+  const stripped = searchTerm
+    .replace(/^(french|side of|a|an|the|order of|some)\s+/i, "")
+    .trim();
+  if (stripped !== searchTerm) {
+    const strippedMatch = allItems.find((item) =>
+      item.name.toLowerCase().includes(stripped)
+    );
+    if (strippedMatch) return strippedMatch;
+  }
 
   return undefined;
 }
