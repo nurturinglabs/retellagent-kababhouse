@@ -50,31 +50,45 @@ export function extractOrderFromTranscript(transcript: string): {
   const seenIds = new Set<string>();
 
   // Helper: derive a "family" key from a menu item id so that protein
-  // variants and size variants don't both match.
-  // e.g. "beef-shawarma-plate" → "shawarma-plate"
-  //      "chicken-shawarma-plate" → "shawarma-plate"
+  // variants, size variants, and plate/sandwich variants don't all match.
+  // e.g. "beef-shawarma-plate" → "shawarma"
+  //      "chicken-shawarma-sandwich" → "shawarma"
   //      "fries-small" → "fries"
   function familyKey(id: string): string {
     return id
       .replace(/^(beef|chicken|lamb|arabi)-/, "")
-      .replace(/-(small|large|side|\d+)$/, "");
+      .replace(/-(plate|sandwich|wrap|small|large|side|\d+)$/, "");
   }
 
-  // Track item "families" so e.g. matching "Beef Shawarma Plate" blocks
-  // "Chicken Shawarma Plate", and "large fries" blocks "small fries".
+  // Track item "families" so e.g. matching "Chicken Shawarma Sandwich"
+  // blocks "Chicken Shawarma Plate" and "Beef Shawarma Plate".
   const seenFamilies = new Set<string>();
+
+  // Collect matched text spans so aliases that are substrings of already-
+  // matched full item names are skipped (e.g. "chicken shawarma" inside
+  // "chicken shawarma sandwich").
+  const matchedSpans: { start: number; end: number }[] = [];
 
   // 1. Direct menu name matching against relevant transcript text
   for (const item of menuItems) {
     const itemNameLower = item.name.toLowerCase();
-    if (lowerText.includes(itemNameLower) && !seenIds.has(item.id)) {
+    const idx = lowerText.indexOf(itemNameLower);
+    if (idx !== -1 && !seenIds.has(item.id)) {
       const family = familyKey(item.id);
       if (seenFamilies.has(family)) continue;
       const quantity = extractQuantityBefore(lowerText, itemNameLower);
       foundItems.push({ name: item.name, quantity });
       seenIds.add(item.id);
       seenFamilies.add(family);
+      matchedSpans.push({ start: idx, end: idx + itemNameLower.length });
     }
+  }
+
+  // Helper: check if an alias match is entirely within an already-matched span
+  function isInsideMatchedSpan(aliasStart: number, aliasEnd: number): boolean {
+    return matchedSpans.some(
+      (span) => aliasStart >= span.start && aliasEnd <= span.end
+    );
   }
 
   // 2. Alias-based matching: scan the relevant text for every known alias
@@ -85,7 +99,11 @@ export function extractOrderFromTranscript(transcript: string): {
     (a, b) => b.length - a.length
   );
   for (const aliasKey of sortedAliases) {
-    if (lowerText.includes(aliasKey)) {
+    const aliasIdx = lowerText.indexOf(aliasKey);
+    if (aliasIdx !== -1) {
+      // Skip if this alias text is fully inside an already-matched item name
+      if (isInsideMatchedSpan(aliasIdx, aliasIdx + aliasKey.length)) continue;
+
       const menuItem = getMenuItem(aliasKey);
       if (menuItem && !seenIds.has(menuItem.id)) {
         const family = familyKey(menuItem.id);
@@ -349,15 +367,37 @@ function extractQuantityBefore(
 }
 
 function extractCustomerName(transcript: string): string | null {
+  // Words that commonly follow "I'm" / "this is" but aren't names
+  const falsePositives = new Set([
+    "here", "ready", "looking", "calling", "interested", "trying",
+    "going", "just", "also", "not", "good", "fine", "done", "back",
+    "waiting", "ordering", "wondering", "sure", "sorry", "happy",
+  ]);
+
   const patterns = [
-    /(?:my name is|name's|this is|i'm|i am)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
+    /(?:my name is|name's|this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
     /(?:under the name|for)\s+([A-Z][a-z]+)/i,
   ];
 
   for (const pattern of patterns) {
     const match = transcript.match(pattern);
     if (match && match[1]) {
-      return match[1].trim();
+      const candidate = match[1].trim();
+      if (falsePositives.has(candidate.toLowerCase().split(/\s+/)[0])) {
+        continue; // skip "here to", "looking for", etc.
+      }
+      return candidate;
+    }
+  }
+
+  // Fallback: look for agent addressing user by name in confirmation
+  // e.g. "Great, Even!" or "Thanks Anthony!"
+  const agentNamePattern = /(?:Great|Thanks|Thank you|Awesome),?\s+([A-Z][a-z]+)!/i;
+  const agentMatch = transcript.match(agentNamePattern);
+  if (agentMatch && agentMatch[1]) {
+    const candidate = agentMatch[1].trim();
+    if (!falsePositives.has(candidate.toLowerCase())) {
+      return candidate;
     }
   }
 
