@@ -361,14 +361,13 @@ export const MENU_ITEMS: Record<string, MenuItem[]> = {
 // Covers alternate spellings, abbreviations, and casual phrasing customers
 // are likely to use over the phone.
 export const ALIASES: Record<string, string> = {
-  // ── Fries ───────────────────────────────────────────────────────────────
+  // ── Fries (no bare "fries" — agent always asks for size) ────────────────
+  "small french fries": "fries (small)",
+  "small fries": "fries (small)",
   "french fries": "fries (small)",
   "french fry": "fries (small)",
-  "fries": "fries (small)",
-  "small fries": "fries (small)",
-  "small french fries": "fries (small)",
-  "large fries": "fries (large)",
   "large french fries": "fries (large)",
+  "large fries": "fries (large)",
   "big fries": "fries (large)",
 
   // ── Rice ────────────────────────────────────────────────────────────────

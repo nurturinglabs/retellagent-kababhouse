@@ -62,13 +62,23 @@ export function extractOrderFromTranscript(transcript: string): {
   // 2. Alias-based matching: scan the relevant text for every known alias
   //    (e.g. "garlic sauce", "french fries", "chicken shirmer") and resolve
   //    them to actual menu items via getMenuItem.
-  for (const aliasKey of Object.keys(ALIASES)) {
+  //    Sort longest-first so "large fries" matches before "french fries".
+  const sortedAliases = Object.keys(ALIASES).sort(
+    (a, b) => b.length - a.length
+  );
+  // Track item "families" so e.g. matching "large fries" blocks "small fries"
+  const seenFamilies = new Set<string>();
+  for (const aliasKey of sortedAliases) {
     if (lowerText.includes(aliasKey)) {
       const menuItem = getMenuItem(aliasKey);
       if (menuItem && !seenIds.has(menuItem.id)) {
+        // Derive family key: "fries-small" → "fries", "fries-large" → "fries"
+        const family = menuItem.id.replace(/-(small|large|side|\d+)$/, "");
+        if (seenFamilies.has(family)) continue; // skip size variants
         const quantity = extractQuantityBefore(lowerText, aliasKey);
         foundItems.push({ name: menuItem.name, quantity });
         seenIds.add(menuItem.id);
+        seenFamilies.add(family);
       }
     }
   }
