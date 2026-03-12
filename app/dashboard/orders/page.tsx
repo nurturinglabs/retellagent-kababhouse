@@ -122,12 +122,12 @@ const DEMO_ORDERS: Order[] = [
 // ---- Helpers ---------------------------------------------------------------
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  pending:    { label: "Pending",    className: "bg-yellow-100 text-yellow-800 border-yellow-200" },
-  confirmed:  { label: "Confirmed",  className: "bg-blue-100 text-blue-800 border-blue-200" },
-  preparing:  { label: "Preparing",  className: "bg-orange-100 text-orange-800 border-orange-200" },
-  ready:      { label: "Ready",      className: "bg-green-100 text-green-800 border-green-200" },
-  completed:  { label: "Completed",  className: "bg-gray-100 text-gray-700 border-gray-200" },
-  cancelled:  { label: "Cancelled",  className: "bg-red-100 text-red-800 border-red-200" },
+  pending:    { label: "Pending",    className: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" },
+  confirmed:  { label: "Confirmed",  className: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+  preparing:  { label: "Preparing",  className: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
+  ready:      { label: "Ready",      className: "bg-green-500/10 text-green-400 border-green-500/20" },
+  completed:  { label: "Completed",  className: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20" },
+  cancelled:  { label: "Cancelled",  className: "bg-red-500/10 text-red-400 border-red-500/20" },
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -197,91 +197,96 @@ export default function OrdersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Orders</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage and track all incoming orders</p>
+          <h1 className="text-2xl font-bold text-white">Orders</h1>
+          <p className="mt-1 text-sm text-zinc-400">Manage and track all incoming orders</p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
+        <button
+          onClick={fetchData}
+          disabled={loading}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.05] px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.08] disabled:opacity-50"
+        >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-          <span className="ml-1.5">Refresh</span>
-        </Button>
+          <span>Refresh</span>
+        </button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Recent Orders</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead className="hidden md:table-cell">Items</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="hidden sm:table-cell">Time</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02]">
+        <div className="border-b border-white/[0.06] px-6 py-4">
+          <h2 className="text-lg font-semibold text-white">Recent Orders</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/[0.06]">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Order ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Customer</th>
+                <th className="hidden px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 md:table-cell">Items</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Total</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Status</th>
+                <th className="hidden px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 sm:table-cell">Time</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
               {orders.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                <tr>
+                  <td colSpan={7} className="py-8 text-center text-zinc-500">
                     No orders yet. Orders will appear here as they come in.
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : (
                 orders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-mono text-xs">{order.id}</TableCell>
-                    <TableCell>
-                      <div className="font-medium">{order.customer_name}</div>
-                      <div className="text-xs text-gray-500">
+                  <tr key={order.id} className="border-b border-white/[0.04] transition-colors hover:bg-white/[0.02]">
+                    <td className="px-6 py-4 font-mono text-xs text-zinc-300">{order.id}</td>
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-zinc-300">{order.customer_name}</div>
+                      <div className="text-xs text-zinc-500">
                         {order.order_type === "delivery" ? "Delivery" : "Pickup"}
                       </div>
-                    </TableCell>
-                    <TableCell className="hidden max-w-[200px] truncate md:table-cell">
+                    </td>
+                    <td className="hidden max-w-[200px] truncate px-6 py-4 text-sm text-zinc-400 md:table-cell">
                       {truncateItems(order.order_items)}
-                    </TableCell>
-                    <TableCell className="font-medium">{formatCurrency(order.order_total)}</TableCell>
-                    <TableCell><StatusBadge status={order.order_status} /></TableCell>
-                    <TableCell className="hidden text-sm text-gray-500 sm:table-cell">
+                    </td>
+                    <td className="px-6 py-4 font-medium text-zinc-300">{formatCurrency(order.order_total)}</td>
+                    <td className="px-6 py-4"><StatusBadge status={order.order_status} /></td>
+                    <td className="hidden px-6 py-4 text-sm text-zinc-500 sm:table-cell">
                       {formatTime(order.created_at)}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-6 py-4">
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="xs" asChild>
-                          <Link href={`/dashboard/orders/${order.id}`}>View</Link>
-                        </Button>
+                        <Link
+                          href={`/dashboard/orders/${order.id}`}
+                          className="rounded-md px-2.5 py-1 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/[0.05] hover:text-zinc-300"
+                        >
+                          View
+                        </Link>
                         {(order.order_status === "confirmed" || order.order_status === "preparing") && (
-                          <Button
-                            variant="outline"
-                            size="xs"
+                          <button
                             disabled={updatingOrderId === order.id}
                             onClick={() => updateOrderStatus(order.id, "ready")}
+                            className="inline-flex items-center rounded-md border border-white/[0.06] bg-white/[0.05] px-2.5 py-1 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/[0.08] disabled:opacity-50"
                           >
                             {updatingOrderId === order.id ? <Loader2 className="h-3 w-3 animate-spin" /> : "Mark Ready"}
-                          </Button>
+                          </button>
                         )}
                         {order.order_status === "ready" && (
-                          <Button
-                            variant="outline"
-                            size="xs"
+                          <button
                             disabled={updatingOrderId === order.id}
                             onClick={() => updateOrderStatus(order.id, "completed")}
+                            className="inline-flex items-center rounded-md border border-white/[0.06] bg-white/[0.05] px-2.5 py-1 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/[0.08] disabled:opacity-50"
                           >
                             {updatingOrderId === order.id ? <Loader2 className="h-3 w-3 animate-spin" /> : "Complete"}
-                          </Button>
+                          </button>
                         )}
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

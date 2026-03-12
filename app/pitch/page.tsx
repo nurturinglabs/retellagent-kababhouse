@@ -148,7 +148,7 @@ export default function PitchPage() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white/[0.02] border border-white/[0.04]"
+                className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]"
               >
                 <div style={{ color: `${BRAND_LIGHT}B3` }}>{item.icon}</div>
                 <p className="text-zinc-500 text-sm leading-relaxed">
@@ -203,7 +203,7 @@ export default function PitchPage() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.04]"
+                className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]"
               >
                 <p
                   className="text-3xl md:text-4xl font-bold"
@@ -268,7 +268,7 @@ export default function PitchPage() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white/[0.02] border border-white/[0.04] transition-colors"
+                className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] transition-colors"
                 style={{ ["--hover-bg" as string]: `${BRAND}0A` }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = `${BRAND}0A`)}
                 onMouseLeave={(e) => (e.currentTarget.style.background = "")}
@@ -301,7 +301,7 @@ export default function PitchPage() {
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 pt-8">
             {/* Step 1 */}
-            <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/[0.02] border border-white/[0.04] w-full md:w-72">
+            <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] w-full md:w-72">
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center"
                 style={{ background: `${BRAND}1A` }}
@@ -317,7 +317,7 @@ export default function PitchPage() {
             <ArrowRight className="w-8 h-8 text-zinc-700 shrink-0 rotate-90 md:rotate-0 mx-4" />
 
             {/* Step 2 */}
-            <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/[0.02] border border-white/[0.04] w-full md:w-72">
+            <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] w-full md:w-72">
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center"
                 style={{ background: `${BRAND}1A` }}
@@ -333,7 +333,7 @@ export default function PitchPage() {
             <ArrowRight className="w-8 h-8 text-zinc-700 shrink-0 rotate-90 md:rotate-0 mx-4" />
 
             {/* Step 3 */}
-            <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/[0.02] border border-white/[0.04] w-full md:w-72">
+            <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] w-full md:w-72">
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center"
                 style={{ background: `${BRAND}1A` }}
@@ -433,7 +433,7 @@ export default function PitchPage() {
       </PitchSlide>
 
       {/* ── Footer ── */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.04] bg-[#060606]/80 backdrop-blur-sm">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.06] bg-[#060606]/80 backdrop-blur-sm">
         <div className="max-w-[1400px] mx-auto h-9 flex items-center justify-between px-4 sm:px-6 lg:px-8 text-[11px] text-zinc-700">
           <span>&copy; 2026 Kabab House</span>
           <span>Authentic Middle Eastern Cuisine — Oak Creek, WI</span>

@@ -247,12 +247,12 @@ const busiestHours = [
 function VolTip({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color: string }>; label?: string }) {
   if (!active || !payload) return null;
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-[11px] shadow-md">
-      <p className="mb-0.5 font-semibold text-gray-600">{label}</p>
+    <div className="rounded-lg border border-white/[0.06] bg-[#0a0a0a] px-2.5 py-1.5 text-[11px] text-zinc-300 shadow-none">
+      <p className="mb-0.5 font-semibold text-zinc-400">{label}</p>
       {payload.map((p) => (
         <p key={p.name} className="flex items-center gap-1.5">
           <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: p.color }} />
-          {p.name}: <b>{p.value}</b>
+          {p.name}: <b className="text-white">{p.value}</b>
         </p>
       ))}
     </div>
@@ -262,9 +262,9 @@ function VolTip({ active, payload, label }: { active?: boolean; payload?: Array<
 function HrTip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
   if (!active || !payload?.[0]) return null;
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-[11px] shadow-md">
-      <p className="font-semibold text-gray-600">{label}</p>
-      <p className="font-bold text-[#c2571a]">{payload[0].value} orders</p>
+    <div className="rounded-lg border border-white/[0.06] bg-[#0a0a0a] px-2.5 py-1.5 text-[11px] shadow-none">
+      <p className="font-semibold text-zinc-400">{label}</p>
+      <p className="font-bold text-orange-400">{payload[0].value} orders</p>
     </div>
   );
 }
@@ -312,28 +312,28 @@ export default function DashboardPage() {
       {/* ── HEADER ─────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-xl font-bold text-white">
             Business Insights
           </h1>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-zinc-500">
             {view.dateRange} &middot; {totalOrders.toLocaleString()} orders &middot; {customers} customers
           </p>
         </div>
         <div className="flex items-center gap-2">
           {!isLive && (
-            <Badge variant="outline" className="border-amber-300 bg-amber-50 text-[10px] text-amber-700">
+            <Badge variant="outline" className="border-orange-500/20 bg-orange-600/10 text-[10px] text-orange-400">
               Demo Data
             </Badge>
           )}
-          <div className="inline-flex rounded-lg border bg-white p-0.5 dark:border-gray-700 dark:bg-gray-900">
+          <div className="inline-flex rounded-lg border border-white/[0.06] bg-white/[0.02] p-0.5">
             {(["daily", "weekly", "monthly"] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setFilter(mode)}
                 className={`rounded-md px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
                   filter === mode
-                    ? "bg-[#c2571a] text-white"
-                    : "text-gray-400 hover:text-gray-700"
+                    ? "bg-orange-500 text-white"
+                    : "text-zinc-500 hover:text-zinc-300"
                 }`}
               >
                 {mode.charAt(0).toUpperCase() + mode.slice(1)}
@@ -356,14 +356,14 @@ export default function DashboardPage() {
           return (
             <div
               key={c.label}
-              className="flex items-start justify-between rounded-xl bg-white p-3 shadow-sm dark:bg-gray-900"
+              className="flex items-start justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 shadow-none"
             >
               <div>
-                <Icon className="mb-2 h-4 w-4" style={{ color: c.color }} />
+                <Icon className="mb-2 h-4 w-4 opacity-70" style={{ color: c.color }} />
                 <p className="text-xl font-bold leading-none" style={{ color: c.color }}>
                   {c.value}
                 </p>
-                <p className="mt-1 text-[9px] font-semibold uppercase tracking-widest text-gray-400">
+                <p className="mt-1 text-[9px] font-semibold uppercase tracking-widest text-zinc-600">
                   {c.label}
                 </p>
               </div>
@@ -376,12 +376,12 @@ export default function DashboardPage() {
       {/* ── MIDDLE ROW: Stacked Bar + Donut ────────────────────────────── */}
       <div className="grid min-h-0 flex-1 grid-cols-[1fr_280px] gap-3">
         {/* Order Volume by Type */}
-        <div className="flex flex-col rounded-xl bg-white p-3 shadow-sm dark:bg-gray-900">
+        <div className="flex flex-col rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 shadow-none">
           <div className="mb-1 flex items-center justify-between">
-            <h2 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
+            <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-500">
               {filter === "daily" ? "Today\u2019s Orders by Hour" : filter === "weekly" ? "This Week\u2019s Orders" : "Last 30 Days Orders"}
             </h2>
-            <div className="flex items-center gap-3 text-[10px] text-gray-500">
+            <div className="flex items-center gap-3 text-[10px] text-zinc-500">
               {(["Pickup", "Delivery", "Catering", "Inquiry"] as const).map((n) => (
                 <span key={n} className="flex items-center gap-1">
                   <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: STACK[n.toLowerCase() as keyof typeof STACK] }} />
@@ -394,15 +394,15 @@ export default function DashboardPage() {
             {mounted && (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} barGap={0} barCategoryGap={filter === "weekly" ? "25%" : "18%"}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 9, fill: "#94a3b8" }}
+                    tick={{ fontSize: 9, fill: "#71717a" }}
                     interval={xInterval}
                     axisLine={false}
                     tickLine={false}
                   />
-                  <YAxis tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} width={28} />
+                  <YAxis tick={{ fontSize: 9, fill: "#71717a" }} axisLine={false} tickLine={false} width={28} />
                   <Tooltip content={<VolTip />} />
                   <Bar dataKey="pickup" stackId="a" fill={STACK.pickup} name="Pickup" />
                   <Bar dataKey="delivery" stackId="a" fill={STACK.delivery} name="Delivery" />
@@ -415,22 +415,22 @@ export default function DashboardPage() {
         </div>
 
         {/* Donut: Call Type Breakdown */}
-        <div className="flex flex-col items-center rounded-xl bg-white p-3 shadow-sm dark:bg-gray-900">
-          <h2 className="mb-1 self-start text-[11px] font-bold uppercase tracking-widest text-gray-500">
+        <div className="flex flex-col items-center rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 shadow-none">
+          <h2 className="mb-1 self-start text-[11px] font-bold uppercase tracking-widest text-zinc-500">
             Call Type Breakdown
           </h2>
           <div className="flex flex-1 items-center justify-center">
             {mounted && (
               <ResponsiveContainer width={170} height={170}>
                 <PieChart>
-                  <Pie data={donutData} cx="50%" cy="50%" innerRadius={42} outerRadius={72} dataKey="value" strokeWidth={2} stroke="#fff">
+                  <Pie data={donutData} cx="50%" cy="50%" innerRadius={42} outerRadius={72} dataKey="value" strokeWidth={2} stroke="#0a0a0a">
                     {donutData.map((_, i) => (
                       <Cell key={i} fill={DONUT[i]} />
                     ))}
                   </Pie>
                   <Tooltip
                     formatter={(v?: number, n?: string) => [`${v ?? 0} calls`, n ?? ""]}
-                    contentStyle={{ borderRadius: "8px", fontSize: "11px", border: "1px solid #e5e7eb" }}
+                    contentStyle={{ borderRadius: "8px", fontSize: "11px", border: "1px solid rgba(255,255,255,0.06)", backgroundColor: "#0a0a0a", color: "#d4d4d8" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -439,11 +439,11 @@ export default function DashboardPage() {
           <div className="grid w-full grid-cols-2 gap-x-4 gap-y-1">
             {donutData.map((item, i) => (
               <div key={item.name} className="flex items-center justify-between text-[11px]">
-                <span className="flex items-center gap-1.5 text-gray-600">
+                <span className="flex items-center gap-1.5 text-zinc-400">
                   <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: DONUT[i] }} />
                   {item.name}
                 </span>
-                <span className="font-bold text-gray-800">
+                <span className="font-bold text-zinc-200">
                   {totalCalls ? Math.round((item.value / totalCalls) * 100) : 0}%
                 </span>
               </div>
@@ -455,17 +455,17 @@ export default function DashboardPage() {
       {/* ── BOTTOM ROW: Busiest Hours + Insights + Status ──────────────── */}
       <div className="grid grid-cols-3 gap-3">
         {/* Busiest Hours */}
-        <div className="rounded-xl bg-white p-3 shadow-sm dark:bg-gray-900">
-          <h2 className="mb-1 text-[11px] font-bold uppercase tracking-widest text-gray-500">
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 shadow-none">
+          <h2 className="mb-1 text-[11px] font-bold uppercase tracking-widest text-zinc-500">
             Busiest Hours
           </h2>
           <div className="h-[150px]">
             {mounted && (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={busiestHours}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-                  <XAxis dataKey="hour" tick={{ fontSize: 8, fill: "#94a3b8" }} interval={1} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} width={24} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                  <XAxis dataKey="hour" tick={{ fontSize: 8, fill: "#71717a" }} interval={1} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 9, fill: "#71717a" }} axisLine={false} tickLine={false} width={24} />
                   <Tooltip content={<HrTip />} />
                   <Bar dataKey="orders" fill={C.teal} radius={[2, 2, 0, 0]} />
                 </BarChart>
@@ -475,47 +475,47 @@ export default function DashboardPage() {
         </div>
 
         {/* Business Insights */}
-        <div className="rounded-xl bg-white p-3 shadow-sm dark:bg-gray-900">
-          <h2 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-500">
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 shadow-none">
+          <h2 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-zinc-500">
             Business Insights
           </h2>
           <div className="space-y-3">
             <div>
               <div className="flex items-baseline justify-between">
-                <span className="text-xs font-medium text-gray-700">Repeat Customer Rate</span>
-                <span className="text-xs font-bold text-gray-900">{repeatRate}%</span>
+                <span className="text-xs font-medium text-zinc-300">Repeat Customer Rate</span>
+                <span className="text-xs font-bold text-white">{repeatRate}%</span>
               </div>
-              <div className="mt-1 h-[6px] w-full overflow-hidden rounded-full bg-gray-100">
+              <div className="mt-1 h-[6px] w-full overflow-hidden rounded-full bg-white/[0.06]">
                 <div className="h-full rounded-full bg-blue-500" style={{ width: `${repeatRate}%` }} />
               </div>
-              <p className="mt-0.5 text-[10px] text-gray-400">{Math.round(customers * repeatRate / 100)} returning customers</p>
+              <p className="mt-0.5 text-[10px] text-zinc-600">{Math.round(customers * repeatRate / 100)} returning customers</p>
             </div>
             <div>
               <div className="flex items-baseline justify-between">
-                <span className="text-xs font-medium text-gray-700">Cancellation Rate</span>
-                <span className="text-xs font-bold text-gray-900">{cancelPct}%</span>
+                <span className="text-xs font-medium text-zinc-300">Cancellation Rate</span>
+                <span className="text-xs font-bold text-white">{cancelPct}%</span>
               </div>
-              <div className="mt-1 h-[6px] w-full overflow-hidden rounded-full bg-gray-100">
+              <div className="mt-1 h-[6px] w-full overflow-hidden rounded-full bg-white/[0.06]">
                 <div className="h-full rounded-full bg-rose-500" style={{ width: `${cancelPct}%` }} />
               </div>
-              <p className="mt-0.5 text-[10px] text-gray-400">{cancelled} cancelled orders</p>
+              <p className="mt-0.5 text-[10px] text-zinc-600">{cancelled} cancelled orders</p>
             </div>
             <div>
               <div className="flex items-baseline justify-between">
-                <span className="text-xs font-medium text-gray-700">Avg Order Value</span>
-                <span className="text-xs font-bold text-gray-900">${avgOrderValue.toFixed(2)}</span>
+                <span className="text-xs font-medium text-zinc-300">Avg Order Value</span>
+                <span className="text-xs font-bold text-white">${avgOrderValue.toFixed(2)}</span>
               </div>
-              <div className="mt-1 h-[6px] w-full overflow-hidden rounded-full bg-gray-100">
+              <div className="mt-1 h-[6px] w-full overflow-hidden rounded-full bg-white/[0.06]">
                 <div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.min((avgOrderValue / 50) * 100, 100)}%` }} />
               </div>
-              <p className="mt-0.5 text-[10px] text-gray-400">target $50.00</p>
+              <p className="mt-0.5 text-[10px] text-zinc-600">target $50.00</p>
             </div>
           </div>
         </div>
 
         {/* Status Overview */}
-        <div className="rounded-xl bg-white p-3 shadow-sm dark:bg-gray-900">
-          <h2 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-500">
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 shadow-none">
+          <h2 className="mb-2 text-[11px] font-bold uppercase tracking-widest text-zinc-500">
             Status Overview
           </h2>
           <div className="space-y-2">
@@ -523,11 +523,11 @@ export default function DashboardPage() {
               <div key={s.label}>
                 <div className="flex items-center gap-2 text-xs">
                   <span className={`inline-block h-2 w-2 rounded-full ${s.dot}`} />
-                  <span className="flex-1 text-gray-600">{s.label}</span>
-                  <span className="font-bold text-gray-900">{s.count}</span>
-                  <span className="w-10 text-right text-[10px] text-gray-400">({s.pct}%)</span>
+                  <span className="flex-1 text-zinc-400">{s.label}</span>
+                  <span className="font-bold text-white">{s.count}</span>
+                  <span className="w-10 text-right text-[10px] text-zinc-600">({s.pct}%)</span>
                 </div>
-                <div className="ml-4 mt-0.5 h-[5px] w-full overflow-hidden rounded-full bg-gray-100">
+                <div className="ml-4 mt-0.5 h-[5px] w-full overflow-hidden rounded-full bg-white/[0.06]">
                   <div className={`h-full rounded-full ${s.bar}`} style={{ width: `${s.pct}%` }} />
                 </div>
               </div>
@@ -537,20 +537,20 @@ export default function DashboardPage() {
       </div>
 
       {/* ── FOOTER BAR ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-center gap-6 rounded-xl bg-white px-4 py-2 shadow-sm dark:bg-gray-900">
+      <div className="flex items-center justify-center gap-6 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2 shadow-none">
         <div className="text-center">
-          <p className="text-sm font-bold text-[#c2571a]">{totalOrders}</p>
-          <p className="text-[9px] font-semibold uppercase tracking-widest text-gray-400">{view.footerLabels[0]}</p>
+          <p className="text-sm font-bold text-orange-400">{totalOrders}</p>
+          <p className="text-[9px] font-semibold uppercase tracking-widest text-zinc-600">{view.footerLabels[0]}</p>
         </div>
-        <div className="h-6 w-px bg-gray-200" />
+        <div className="h-6 w-px bg-white/[0.06]" />
         <div className="text-center">
-          <p className="text-sm font-bold text-[#c2571a]">{totalCalls}</p>
-          <p className="text-[9px] font-semibold uppercase tracking-widest text-gray-400">{view.footerLabels[1]}</p>
+          <p className="text-sm font-bold text-orange-400">{totalCalls}</p>
+          <p className="text-[9px] font-semibold uppercase tracking-widest text-zinc-600">{view.footerLabels[1]}</p>
         </div>
-        <div className="h-6 w-px bg-gray-200" />
+        <div className="h-6 w-px bg-white/[0.06]" />
         <div className="text-center">
-          <p className="text-sm font-bold text-[#c2571a]">{customers}</p>
-          <p className="text-[9px] font-semibold uppercase tracking-widest text-gray-400">{view.footerLabels[2]}</p>
+          <p className="text-sm font-bold text-orange-400">{customers}</p>
+          <p className="text-[9px] font-semibold uppercase tracking-widest text-zinc-600">{view.footerLabels[2]}</p>
         </div>
       </div>
     </div>

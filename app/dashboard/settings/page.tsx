@@ -124,8 +124,8 @@ export default function SettingsPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground">Loading settings...</p>
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
+          <p className="text-zinc-500">Loading settings...</p>
         </div>
       </div>
     );
@@ -134,46 +134,58 @@ export default function SettingsPage() {
   if (!settings) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-destructive">Failed to load settings.</p>
+        <p className="text-red-400">Failed to load settings.</p>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-4 md:p-6">
-      <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-white">Settings</h1>
 
       {/* Card 1: Business Information */}
-      <Card>
+      <Card className="border-white/[0.06] bg-white/[0.02]">
         <CardHeader>
-          <CardTitle>Business Information</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">Business Information</CardTitle>
+          <CardDescription className="text-zinc-500">
             Your restaurant details as configured in the system.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Business Name</Label>
-              <Input value={settings.business_name} readOnly />
+              <Label className="text-zinc-300">Business Name</Label>
+              <Input
+                value={settings.business_name}
+                readOnly
+                className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600"
+              />
             </div>
             <div className="space-y-2">
-              <Label>Phone Number</Label>
-              <Input value={settings.phone} readOnly />
+              <Label className="text-zinc-300">Phone Number</Label>
+              <Input
+                value={settings.phone}
+                readOnly
+                className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600"
+              />
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Address</Label>
-            <Input value={settings.address} readOnly />
+            <Label className="text-zinc-300">Address</Label>
+            <Input
+              value={settings.address}
+              readOnly
+              className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600"
+            />
           </div>
         </CardContent>
       </Card>
 
       {/* Card 2: Business Hours */}
-      <Card>
+      <Card className="border-white/[0.06] bg-white/[0.02]">
         <CardHeader>
-          <CardTitle>Business Hours</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">Business Hours</CardTitle>
+          <CardDescription className="text-zinc-500">
             Set your opening and closing times for each day of the week.
           </CardDescription>
         </CardHeader>
@@ -181,19 +193,19 @@ export default function SettingsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b text-left">
-                  <th className="pb-2 pr-4 font-medium">Day</th>
-                  <th className="pb-2 pr-4 font-medium">Open</th>
-                  <th className="pb-2 pr-4 font-medium">Close</th>
-                  <th className="pb-2 font-medium">Closed</th>
+                <tr className="border-b border-white/[0.06] text-left">
+                  <th className="pb-2 pr-4 font-medium text-zinc-300">Day</th>
+                  <th className="pb-2 pr-4 font-medium text-zinc-300">Open</th>
+                  <th className="pb-2 pr-4 font-medium text-zinc-300">Close</th>
+                  <th className="pb-2 font-medium text-zinc-300">Closed</th>
                 </tr>
               </thead>
               <tbody>
                 {DAY_ORDER.map((day) => {
                   const hours = settings.regular_hours[day];
                   return (
-                    <tr key={day} className="border-b last:border-0">
-                      <td className="py-3 pr-4 font-medium">
+                    <tr key={day} className="border-b border-white/[0.05] last:border-0">
+                      <td className="py-3 pr-4 font-medium text-zinc-300">
                         {DAY_LABELS[day]}
                       </td>
                       <td className="py-3 pr-4">
@@ -201,7 +213,7 @@ export default function SettingsPage() {
                           type="time"
                           value={hours?.open ?? "11:00"}
                           disabled={hours?.closed}
-                          className="w-32"
+                          className="w-32 bg-white/[0.03] border-white/[0.08] text-zinc-200 focus:border-orange-500/50"
                           onChange={(e) =>
                             updateHours(day, "open", e.target.value)
                           }
@@ -212,7 +224,7 @@ export default function SettingsPage() {
                           type="time"
                           value={hours?.close ?? "21:00"}
                           disabled={hours?.closed}
-                          className="w-32"
+                          className="w-32 bg-white/[0.03] border-white/[0.08] text-zinc-200 focus:border-orange-500/50"
                           onChange={(e) =>
                             updateHours(day, "close", e.target.value)
                           }
@@ -236,10 +248,10 @@ export default function SettingsPage() {
       </Card>
 
       {/* Card 3: Holiday Closures */}
-      <Card>
+      <Card className="border-white/[0.06] bg-white/[0.02]">
         <CardHeader>
-          <CardTitle>Holiday Closures</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">Holiday Closures</CardTitle>
+          <CardDescription className="text-zinc-500">
             Manage dates when the restaurant will be closed.
           </CardDescription>
         </CardHeader>
@@ -249,11 +261,11 @@ export default function SettingsPage() {
               {settings.holiday_closures.map((holiday, idx) => (
                 <li
                   key={idx}
-                  className="flex items-center justify-between rounded-md border p-3"
+                  className="flex items-center justify-between rounded-md border border-white/[0.06] bg-white/[0.02] p-3"
                 >
                   <div>
-                    <p className="text-sm font-medium">{holiday.date}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm font-medium text-zinc-300">{holiday.date}</p>
+                    <p className="text-xs text-zinc-500">
                       {holiday.message}
                     </p>
                   </div>
@@ -261,6 +273,7 @@ export default function SettingsPage() {
                     variant="destructive"
                     size="sm"
                     onClick={() => removeHoliday(idx)}
+                    className="bg-red-500/10 text-red-400 hover:bg-red-500/20 border-0"
                   >
                     Remove
                   </Button>
@@ -268,38 +281,39 @@ export default function SettingsPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-zinc-500">
               No holiday closures configured.
             </p>
           )}
 
-          <Separator />
+          <Separator className="bg-white/[0.06]" />
 
           <div className="flex flex-wrap items-end gap-3">
             <div className="space-y-2">
-              <Label htmlFor="holiday-date">Date</Label>
+              <Label htmlFor="holiday-date" className="text-zinc-300">Date</Label>
               <Input
                 id="holiday-date"
                 type="date"
                 value={newHolidayDate}
                 onChange={(e) => setNewHolidayDate(e.target.value)}
-                className="w-44"
+                className="w-44 bg-white/[0.03] border-white/[0.08] text-zinc-200 focus:border-orange-500/50"
               />
             </div>
             <div className="flex-1 space-y-2">
-              <Label htmlFor="holiday-message">Message</Label>
+              <Label htmlFor="holiday-message" className="text-zinc-300">Message</Label>
               <Input
                 id="holiday-message"
                 type="text"
                 placeholder="e.g., Closed for New Year's Day"
                 value={newHolidayMessage}
                 onChange={(e) => setNewHolidayMessage(e.target.value)}
+                className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600 focus:border-orange-500/50"
               />
             </div>
             <Button
               onClick={addHoliday}
               disabled={!newHolidayDate}
-              variant="outline"
+              className="bg-white/[0.05] hover:bg-white/[0.08] text-zinc-300 border border-white/[0.06]"
             >
               Add Holiday
             </Button>
@@ -308,10 +322,10 @@ export default function SettingsPage() {
       </Card>
 
       {/* Card 4: Temporary Closure */}
-      <Card>
+      <Card className="border-white/[0.06] bg-white/[0.02]">
         <CardHeader>
-          <CardTitle>Temporary Closure</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">Temporary Closure</CardTitle>
+          <CardDescription className="text-zinc-500">
             Toggle this on to temporarily close the restaurant.
           </CardDescription>
         </CardHeader>
@@ -330,13 +344,13 @@ export default function SettingsPage() {
                 })
               }
             />
-            <Label htmlFor="temp-closed" className="font-medium">
+            <Label htmlFor="temp-closed" className="font-medium text-zinc-300">
               Temporarily Closed
             </Label>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="closure-message">Closure Message</Label>
+            <Label htmlFor="closure-message" className="text-zinc-300">Closure Message</Label>
             <Input
               id="closure-message"
               type="text"
@@ -351,10 +365,11 @@ export default function SettingsPage() {
                   },
                 })
               }
+              className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600 focus:border-orange-500/50"
             />
           </div>
 
-          <p className="text-sm text-amber-600">
+          <p className="text-sm text-orange-400">
             When active, the AI agent will inform callers that you are
             temporarily closed.
           </p>
@@ -362,18 +377,18 @@ export default function SettingsPage() {
       </Card>
 
       {/* Card 5: Delivery Settings */}
-      <Card>
+      <Card className="border-white/[0.06] bg-white/[0.02]">
         <CardHeader>
-          <CardTitle>Delivery Settings</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">Delivery Settings</CardTitle>
+          <CardDescription className="text-zinc-500">
             Configure delivery options via Uber Direct integration.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <Label className="font-medium">Enable Delivery</Label>
-              <p className="text-xs text-muted-foreground">
+              <Label className="font-medium text-zinc-300">Enable Delivery</Label>
+              <p className="text-xs text-zinc-500">
                 Allow customers to order delivery via Uber Direct.
               </p>
             </div>
@@ -397,11 +412,11 @@ export default function SettingsPage() {
             />
           </div>
 
-          <Separator />
+          <Separator className="bg-white/[0.06]" />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="delivery-fee">Delivery Fee ($)</Label>
+              <Label htmlFor="delivery-fee" className="text-zinc-300">Delivery Fee ($)</Label>
               <Input
                 id="delivery-fee"
                 type="number"
@@ -418,10 +433,11 @@ export default function SettingsPage() {
                     },
                   })
                 }
+                className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600 focus:border-orange-500/50"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="delivery-radius">Delivery Radius (miles)</Label>
+              <Label htmlFor="delivery-radius" className="text-zinc-300">Delivery Radius (miles)</Label>
               <Input
                 id="delivery-radius"
                 type="number"
@@ -438,13 +454,14 @@ export default function SettingsPage() {
                     },
                   })
                 }
+                className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600 focus:border-orange-500/50"
               />
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="min-order">Minimum Order Amount ($)</Label>
+              <Label htmlFor="min-order" className="text-zinc-300">Minimum Order Amount ($)</Label>
               <Input
                 id="min-order"
                 type="number"
@@ -461,10 +478,11 @@ export default function SettingsPage() {
                     },
                   })
                 }
+                className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600 focus:border-orange-500/50"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="est-delivery-time">Estimated Delivery Time</Label>
+              <Label htmlFor="est-delivery-time" className="text-zinc-300">Estimated Delivery Time</Label>
               <Input
                 id="est-delivery-time"
                 type="text"
@@ -480,12 +498,13 @@ export default function SettingsPage() {
                     },
                   })
                 }
+                className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600 focus:border-orange-500/50"
               />
             </div>
           </div>
 
           {settings.delivery?.enabled && (
-            <p className="text-sm text-emerald-600">
+            <p className="text-sm text-green-400">
               Delivery is active. Orders dispatched via Uber Direct (mock integration).
             </p>
           )}
@@ -493,17 +512,17 @@ export default function SettingsPage() {
       </Card>
 
       {/* Card 6: Order Settings */}
-      <Card>
+      <Card className="border-white/[0.06] bg-white/[0.02]">
         <CardHeader>
-          <CardTitle>Order Settings</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">Order Settings</CardTitle>
+          <CardDescription className="text-zinc-500">
             Configure default order preparation and staff transfer settings.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="prep-time">Default Prep Time (minutes)</Label>
+              <Label htmlFor="prep-time" className="text-zinc-300">Default Prep Time (minutes)</Label>
               <Input
                 id="prep-time"
                 type="number"
@@ -516,10 +535,11 @@ export default function SettingsPage() {
                     default_prep_time: parseInt(e.target.value, 10) || 25,
                   })
                 }
+                className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600 focus:border-orange-500/50"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="transfer-phone">
+              <Label htmlFor="transfer-phone" className="text-zinc-300">
                 Staff Transfer Phone Number
               </Label>
               <Input
@@ -532,25 +552,26 @@ export default function SettingsPage() {
                     staff_transfer_number: e.target.value,
                   })
                 }
+                className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600 focus:border-orange-500/50"
               />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Card 6: Notification Preferences */}
-      <Card>
+      {/* Card 7: Notification Preferences */}
+      <Card className="border-white/[0.06] bg-white/[0.02]">
         <CardHeader>
-          <CardTitle>Notification Preferences</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">Notification Preferences</CardTitle>
+          <CardDescription className="text-zinc-500">
             Control how you receive notifications about orders and inquiries.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <Label className="font-medium">SMS Notifications</Label>
-              <p className="text-xs text-muted-foreground">
+              <Label className="font-medium text-zinc-300">SMS Notifications</Label>
+              <p className="text-xs text-zinc-500">
                 Receive text messages for new orders and updates.
               </p>
             </div>
@@ -562,12 +583,12 @@ export default function SettingsPage() {
             />
           </div>
 
-          <Separator />
+          <Separator className="bg-white/[0.06]" />
 
           <div className="flex items-center justify-between">
             <div>
-              <Label className="font-medium">Email Notifications</Label>
-              <p className="text-xs text-muted-foreground">
+              <Label className="font-medium text-zinc-300">Email Notifications</Label>
+              <p className="text-xs text-zinc-500">
                 Receive email notifications for orders and catering inquiries.
               </p>
             </div>
@@ -579,10 +600,10 @@ export default function SettingsPage() {
             />
           </div>
 
-          <Separator />
+          <Separator className="bg-white/[0.06]" />
 
           <div className="space-y-2">
-            <Label htmlFor="catering-email">Catering Alert Email</Label>
+            <Label htmlFor="catering-email" className="text-zinc-300">Catering Alert Email</Label>
             <Input
               id="catering-email"
               type="email"
@@ -594,6 +615,7 @@ export default function SettingsPage() {
                   catering_alert_email: e.target.value || undefined,
                 })
               }
+              className="bg-white/[0.03] border-white/[0.08] text-zinc-200 placeholder:text-zinc-600 focus:border-orange-500/50"
             />
           </div>
         </CardContent>
@@ -601,7 +623,12 @@ export default function SettingsPage() {
 
       {/* Save button */}
       <div className="flex justify-end pb-6">
-        <Button onClick={handleSave} disabled={saving} size="lg">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          size="lg"
+          className="bg-orange-600 hover:bg-orange-500 text-white"
+        >
           {saving ? "Saving..." : "Save Settings"}
         </Button>
       </div>

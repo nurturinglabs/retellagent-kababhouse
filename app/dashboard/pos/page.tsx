@@ -48,26 +48,26 @@ const stateConfig: Record<
 > = {
   open: {
     label: "New",
-    color: "text-yellow-700",
-    bg: "bg-yellow-50 border-yellow-200",
+    color: "text-yellow-400",
+    bg: "bg-yellow-500/10 border-yellow-500/20",
     icon: Clock,
   },
   in_progress: {
     label: "Preparing",
-    color: "text-blue-700",
-    bg: "bg-blue-50 border-blue-200",
+    color: "text-blue-400",
+    bg: "bg-blue-500/10 border-blue-500/20",
     icon: ChefHat,
   },
   fulfilled: {
     label: "Ready",
-    color: "text-green-700",
-    bg: "bg-green-50 border-green-200",
+    color: "text-green-400",
+    bg: "bg-green-500/10 border-green-500/20",
     icon: CheckCircle2,
   },
   cancelled: {
     label: "Cancelled",
-    color: "text-red-700",
-    bg: "bg-red-50 border-red-200",
+    color: "text-red-400",
+    bg: "bg-red-500/10 border-red-500/20",
     icon: XCircle,
   },
 };
@@ -135,13 +135,13 @@ export default function POSPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Monitor className="h-6 w-6 text-orange-600" />
+          <h1 className="text-2xl font-bold flex items-center gap-2 text-white">
+            <Monitor className="h-6 w-6 text-orange-500" />
             Clover POS — Kitchen Display
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-zinc-400 mt-1">
             {data?.mock_mode && (
-              <Badge variant="outline" className="mr-2 text-orange-600 border-orange-300">
+              <Badge variant="outline" className="mr-2 text-orange-400 border-orange-500/30">
                 Mock Mode
               </Badge>
             )}
@@ -153,6 +153,7 @@ export default function POSPage() {
           size="sm"
           onClick={fetchOrders}
           disabled={loading}
+          className="border-white/[0.06] bg-white/[0.02] text-zinc-300 hover:bg-white/[0.05] hover:text-white"
         >
           <RefreshCw className={`h-4 w-4 mr-1 ${loading ? "animate-spin" : ""}`} />
           Refresh
@@ -161,32 +162,32 @@ export default function POSPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-white/[0.02] border-white/[0.06]">
           <CardContent className="pt-4 pb-3 px-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wide">Total Orders</p>
-            <p className="text-2xl font-bold">{data?.summary.total ?? 0}</p>
+            <p className="text-xs text-zinc-500 uppercase tracking-wide">Total Orders</p>
+            <p className="text-2xl font-bold text-white">{data?.summary.total ?? 0}</p>
           </CardContent>
         </Card>
-        <Card className="border-yellow-200">
+        <Card className="bg-yellow-500/10 border-yellow-500/20">
           <CardContent className="pt-4 pb-3 px-4">
-            <p className="text-xs text-yellow-600 uppercase tracking-wide">New / Open</p>
-            <p className="text-2xl font-bold text-yellow-700">
+            <p className="text-xs text-yellow-400 uppercase tracking-wide">New / Open</p>
+            <p className="text-2xl font-bold text-yellow-400">
               {data?.summary.open ?? 0}
             </p>
           </CardContent>
         </Card>
-        <Card className="border-blue-200">
+        <Card className="bg-blue-500/10 border-blue-500/20">
           <CardContent className="pt-4 pb-3 px-4">
-            <p className="text-xs text-blue-600 uppercase tracking-wide">Preparing</p>
-            <p className="text-2xl font-bold text-blue-700">
+            <p className="text-xs text-blue-400 uppercase tracking-wide">Preparing</p>
+            <p className="text-2xl font-bold text-blue-400">
               {data?.summary.in_progress ?? 0}
             </p>
           </CardContent>
         </Card>
-        <Card className="border-green-200">
+        <Card className="bg-green-500/10 border-green-500/20">
           <CardContent className="pt-4 pb-3 px-4">
-            <p className="text-xs text-green-600 uppercase tracking-wide">Ready</p>
-            <p className="text-2xl font-bold text-green-700">
+            <p className="text-xs text-green-400 uppercase tracking-wide">Ready</p>
+            <p className="text-2xl font-bold text-green-400">
               {data?.summary.fulfilled ?? 0}
             </p>
           </CardContent>
@@ -195,13 +196,13 @@ export default function POSPage() {
 
       {/* Empty State */}
       {data && data.orders.length === 0 && (
-        <Card>
+        <Card className="bg-white/[0.02] border-white/[0.06]">
           <CardContent className="py-16 text-center">
-            <Monitor className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-600">
+            <Monitor className="h-12 w-12 text-zinc-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-zinc-300">
               No orders yet
             </h3>
-            <p className="text-sm text-gray-400 mt-1 max-w-md mx-auto">
+            <p className="text-sm text-zinc-500 mt-1 max-w-md mx-auto">
               Orders will appear here when customers place them through the
               voice agent or the order API. Try placing a test order using the
               curl command from the testing guide.
@@ -215,7 +216,7 @@ export default function POSPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Column: New */}
           <div>
-            <h2 className="text-sm font-semibold text-yellow-700 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+            <h2 className="text-sm font-semibold text-yellow-400 uppercase tracking-wide mb-3 flex items-center gap-1.5">
               <Clock className="h-4 w-4" /> New Orders ({openOrders.length})
             </h2>
             <div className="space-y-3">
@@ -225,21 +226,21 @@ export default function POSPage() {
                   order={order}
                   onAction={() => updateState(order.id, "in_progress")}
                   actionLabel="Start Preparing"
-                  actionColor="bg-blue-600 hover:bg-blue-700 text-white"
+                  actionColor="bg-blue-600 hover:bg-blue-500 text-white"
                   updating={updatingId === order.id}
                   formatTime={formatTime}
                   getElapsed={getElapsed}
                 />
               ))}
               {openOrders.length === 0 && (
-                <p className="text-xs text-gray-400 italic">No new orders</p>
+                <p className="text-xs text-zinc-600 italic">No new orders</p>
               )}
             </div>
           </div>
 
           {/* Column: Preparing */}
           <div>
-            <h2 className="text-sm font-semibold text-blue-700 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+            <h2 className="text-sm font-semibold text-blue-400 uppercase tracking-wide mb-3 flex items-center gap-1.5">
               <ChefHat className="h-4 w-4" /> Preparing ({inProgressOrders.length})
             </h2>
             <div className="space-y-3">
@@ -249,14 +250,14 @@ export default function POSPage() {
                   order={order}
                   onAction={() => updateState(order.id, "fulfilled")}
                   actionLabel="Mark Ready"
-                  actionColor="bg-green-600 hover:bg-green-700 text-white"
+                  actionColor="bg-green-600 hover:bg-green-500 text-white"
                   updating={updatingId === order.id}
                   formatTime={formatTime}
                   getElapsed={getElapsed}
                 />
               ))}
               {inProgressOrders.length === 0 && (
-                <p className="text-xs text-gray-400 italic">
+                <p className="text-xs text-zinc-600 italic">
                   No orders being prepared
                 </p>
               )}
@@ -265,7 +266,7 @@ export default function POSPage() {
 
           {/* Column: Ready */}
           <div>
-            <h2 className="text-sm font-semibold text-green-700 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+            <h2 className="text-sm font-semibold text-green-400 uppercase tracking-wide mb-3 flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4" /> Ready ({fulfilledOrders.length})
             </h2>
             <div className="space-y-3">
@@ -279,7 +280,7 @@ export default function POSPage() {
                 />
               ))}
               {fulfilledOrders.length === 0 && (
-                <p className="text-xs text-gray-400 italic">
+                <p className="text-xs text-zinc-600 italic">
                   No orders ready
                 </p>
               )}
@@ -289,30 +290,30 @@ export default function POSPage() {
       )}
 
       {/* How it works */}
-      <Card>
+      <Card className="bg-white/[0.02] border-white/[0.06]">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold text-gray-700">
+          <CardTitle className="text-sm font-semibold text-zinc-300">
             How the Clover POS Integration Works
           </CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-gray-500 space-y-2">
+        <CardContent className="text-sm text-zinc-400 space-y-2">
           <p>
-            <strong>1. Customer orders</strong> via voice agent (Retell) or API
+            <strong className="text-zinc-300">1. Customer orders</strong> via voice agent (Retell) or API
             call.
           </p>
           <p>
-            <strong>2. Order syncs to Clover POS</strong> — appears here as
+            <strong className="text-zinc-300">2. Order syncs to Clover POS</strong> — appears here as
             &quot;New&quot; with line items and special instructions.
           </p>
           <p>
-            <strong>3. Kitchen staff clicks &quot;Start Preparing&quot;</strong>{" "}
+            <strong className="text-zinc-300">3. Kitchen staff clicks &quot;Start Preparing&quot;</strong>{" "}
             — order moves to the Preparing column.
           </p>
           <p>
-            <strong>4. When food is ready</strong>, click &quot;Mark Ready&quot;
+            <strong className="text-zinc-300">4. When food is ready</strong>, click &quot;Mark Ready&quot;
             — customer gets notified.
           </p>
-          <p className="text-xs text-orange-600 mt-3">
+          <p className="text-xs text-orange-400 mt-3">
             Currently running in <strong>Mock Mode</strong> — orders are stored
             in-memory. Connect real Clover credentials in Settings to sync with
             your actual POS.
@@ -357,8 +358,8 @@ function OrderCard({
         {/* Header row */}
         <div className="flex items-start justify-between">
           <div>
-            <p className="font-semibold text-sm">{order.id}</p>
-            <p className="text-xs text-gray-500">
+            <p className="font-semibold text-sm text-white">{order.id}</p>
+            <p className="text-xs text-zinc-500">
               {order.title.replace("Voice Order - ", "")}
             </p>
           </div>
@@ -375,33 +376,33 @@ function OrderCard({
         <div className="space-y-1">
           {order.lineItems.map((li) => (
             <div key={li.id} className="flex justify-between text-sm">
-              <span>
+              <span className="text-zinc-300">
                 {li.unitQty}x {li.name}
               </span>
-              <span className="text-gray-500">
+              <span className="text-zinc-500">
                 ${((li.price * li.unitQty) / 100).toFixed(2)}
               </span>
             </div>
           ))}
           {order.lineItems.length === 0 && (
-            <p className="text-xs text-gray-400 italic">No items yet</p>
+            <p className="text-xs text-zinc-600 italic">No items yet</p>
           )}
         </div>
 
         {/* Note */}
         {order.note && (
-          <p className="text-xs text-orange-700 bg-orange-50 rounded px-2 py-1">
+          <p className="text-xs text-orange-400 bg-orange-600/10 rounded px-2 py-1">
             Note: {order.note}
           </p>
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-1 border-t border-gray-200">
-          <div className="text-xs text-gray-400">
+        <div className="flex items-center justify-between pt-1 border-t border-white/[0.05]">
+          <div className="text-xs text-zinc-500">
             {formatTime(order.createdTime)} &middot;{" "}
             {getElapsed(order.createdTime)}
           </div>
-          <p className="text-sm font-semibold">
+          <p className="text-sm font-semibold text-white">
             ${(totalCents / 100).toFixed(2)}
           </p>
         </div>

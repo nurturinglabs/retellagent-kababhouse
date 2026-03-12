@@ -2,22 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { RefreshCw, Loader2, Truck, DollarSign, TrendingUp, Package } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { Order } from "@/lib/types";
 
 // ---- Types -----------------------------------------------------------------
@@ -137,15 +121,19 @@ const DEMO_DELIVERY_ORDERS: Order[] = [
 // ---- Helpers ---------------------------------------------------------------
 
 const deliveryStatusConfig: Record<string, { label: string; className: string }> = {
-  awaiting_dispatch: { label: "Awaiting Dispatch", className: "bg-yellow-100 text-yellow-800 border-yellow-200" },
-  dispatched:        { label: "Dispatched",        className: "bg-blue-100 text-blue-800 border-blue-200" },
-  in_transit:        { label: "In Transit",        className: "bg-orange-100 text-orange-800 border-orange-200" },
-  delivered:         { label: "Delivered",          className: "bg-green-100 text-green-800 border-green-200" },
+  awaiting_dispatch: { label: "Awaiting Dispatch", className: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" },
+  dispatched:        { label: "Dispatched",        className: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+  in_transit:        { label: "In Transit",        className: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
+  delivered:         { label: "Delivered",          className: "bg-green-500/10 text-green-400 border-green-500/20" },
 };
 
 function DeliveryStatusBadge({ status }: { status: string }) {
   const config = deliveryStatusConfig[status] ?? deliveryStatusConfig.awaiting_dispatch;
-  return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${config.className}`}>
+      {config.label}
+    </span>
+  );
 }
 
 function formatCurrency(n: number) { return `$${n.toFixed(2)}`; }
@@ -248,187 +236,181 @@ export default function DeliveryPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Delivery Orders</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage delivery orders and Uber Direct dispatch</p>
+          <h1 className="text-2xl font-bold text-white">Delivery Orders</h1>
+          <p className="mt-1 text-sm text-zinc-400">Manage delivery orders and Uber Direct dispatch</p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
+        <button
+          onClick={fetchData}
+          disabled={loading}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.05] px-3 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.08] disabled:opacity-50"
+        >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-          <span className="ml-1.5">Refresh</span>
-        </Button>
+          <span>Refresh</span>
+        </button>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-blue-50 p-2.5 dark:bg-blue-950/30">
-                <Truck className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats.total_delivery_orders_today}</p>
-                <p className="text-xs text-gray-500">Deliveries Today</p>
-              </div>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-blue-500/10 p-2.5">
+              <Truck className="h-5 w-5 text-blue-400" />
             </div>
-            <div className="mt-3 flex gap-2 text-[11px]">
-              <span className="rounded-full bg-yellow-50 px-2 py-0.5 text-yellow-700">{stats.status_breakdown.awaiting_dispatch} waiting</span>
-              <span className="rounded-full bg-blue-50 px-2 py-0.5 text-blue-700">{stats.status_breakdown.dispatched} dispatched</span>
-              <span className="rounded-full bg-orange-50 px-2 py-0.5 text-orange-700">{stats.status_breakdown.in_transit} in transit</span>
-              <span className="rounded-full bg-green-50 px-2 py-0.5 text-green-700">{stats.status_breakdown.delivered} delivered</span>
+            <div>
+              <p className="text-2xl font-bold text-white">{stats.total_delivery_orders_today}</p>
+              <p className="text-xs text-zinc-500">Deliveries Today</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="mt-3 flex gap-2 text-[11px]">
+            <span className="rounded-full bg-yellow-500/10 px-2 py-0.5 text-yellow-400">{stats.status_breakdown.awaiting_dispatch} waiting</span>
+            <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-blue-400">{stats.status_breakdown.dispatched} dispatched</span>
+            <span className="rounded-full bg-orange-500/10 px-2 py-0.5 text-orange-400">{stats.status_breakdown.in_transit} in transit</span>
+            <span className="rounded-full bg-green-500/10 px-2 py-0.5 text-green-400">{stats.status_breakdown.delivered} delivered</span>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-emerald-50 p-2.5 dark:bg-emerald-950/30">
-                <DollarSign className="h-5 w-5 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{formatCurrency(stats.delivery_revenue_today)}</p>
-                <p className="text-xs text-gray-500">Delivery Revenue</p>
-              </div>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-emerald-500/10 p-2.5">
+              <DollarSign className="h-5 w-5 text-emerald-400" />
             </div>
-            <p className="mt-3 text-[11px] text-gray-400">
-              Food: {formatCurrency(stats.food_total_today)} + Fees: {formatCurrency(stats.delivery_fees_today)}
-            </p>
-          </CardContent>
-        </Card>
+            <div>
+              <p className="text-2xl font-bold text-white">{formatCurrency(stats.delivery_revenue_today)}</p>
+              <p className="text-xs text-zinc-500">Delivery Revenue</p>
+            </div>
+          </div>
+          <p className="mt-3 text-[11px] text-zinc-600">
+            Food: {formatCurrency(stats.food_total_today)} + Fees: {formatCurrency(stats.delivery_fees_today)}
+          </p>
+        </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-orange-50 p-2.5 dark:bg-orange-950/30">
-                <TrendingUp className="h-5 w-5 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.commission_saved_today)}</p>
-                <p className="text-xs text-gray-500">Commission Saved</p>
-              </div>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-orange-500/10 p-2.5">
+              <TrendingUp className="h-5 w-5 text-orange-400" />
             </div>
-            <p className="mt-3 text-[11px] text-gray-400">
-              vs DoorDash 25% commission on {formatCurrency(stats.food_total_today)} food sales
-            </p>
-          </CardContent>
-        </Card>
+            <div>
+              <p className="text-2xl font-bold text-green-400">{formatCurrency(stats.commission_saved_today)}</p>
+              <p className="text-xs text-zinc-500">Commission Saved</p>
+            </div>
+          </div>
+          <p className="mt-3 text-[11px] text-zinc-600">
+            vs DoorDash 25% commission on {formatCurrency(stats.food_total_today)} food sales
+          </p>
+        </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-purple-50 p-2.5 dark:bg-purple-950/30">
-                <Package className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{formatCurrency(stats.delivery_fees_today)}</p>
-                <p className="text-xs text-gray-500">Delivery Fees Collected</p>
-              </div>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-purple-500/10 p-2.5">
+              <Package className="h-5 w-5 text-purple-400" />
             </div>
-            <p className="mt-3 text-[11px] text-gray-400">
-              $6.99 flat fee per delivery order
-            </p>
-          </CardContent>
-        </Card>
+            <div>
+              <p className="text-2xl font-bold text-white">{formatCurrency(stats.delivery_fees_today)}</p>
+              <p className="text-xs text-zinc-500">Delivery Fees Collected</p>
+            </div>
+          </div>
+          <p className="mt-3 text-[11px] text-zinc-600">
+            $6.99 flat fee per delivery order
+          </p>
+        </div>
       </div>
 
       {/* Delivery Orders Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Delivery Orders</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead className="hidden lg:table-cell">Items</TableHead>
-                <TableHead className="hidden md:table-cell">Delivery Address</TableHead>
-                <TableHead>Food Total</TableHead>
-                <TableHead className="hidden sm:table-cell">Del. Fee</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="hidden sm:table-cell">Time</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02]">
+        <div className="border-b border-white/[0.06] px-6 py-4">
+          <h2 className="text-lg font-semibold text-white">Delivery Orders</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/[0.06]">
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Order ID</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Customer</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 lg:table-cell">Items</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 md:table-cell">Delivery Address</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Food Total</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 sm:table-cell">Del. Fee</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Total</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Status</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 sm:table-cell">Time</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/[0.05]">
               {orders.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={10} className="text-center text-gray-500 py-8">
+                <tr>
+                  <td colSpan={10} className="py-8 text-center text-zinc-500">
                     No delivery orders yet. Delivery orders will appear here as they come in.
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : (
                 orders.map((order) => {
                   const foodTotal = order.order_total - (order.delivery_fee ?? 0);
                   return (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-mono text-xs">{order.id}</TableCell>
-                      <TableCell>
-                        <div className="font-medium">{order.customer_name}</div>
-                        <div className="text-xs text-gray-500">{order.customer_phone}</div>
-                      </TableCell>
-                      <TableCell className="hidden max-w-[180px] truncate lg:table-cell">
+                    <tr key={order.id} className="transition-colors hover:bg-white/[0.02]">
+                      <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-zinc-300">{order.id}</td>
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-zinc-300">{order.customer_name}</div>
+                        <div className="text-xs text-zinc-500">{order.customer_phone}</div>
+                      </td>
+                      <td className="hidden max-w-[180px] truncate px-4 py-3 text-sm text-zinc-400 lg:table-cell">
                         {truncateItems(order.order_items)}
-                      </TableCell>
-                      <TableCell className="hidden max-w-[160px] md:table-cell">
-                        <div className="text-xs">{order.delivery_address}</div>
+                      </td>
+                      <td className="hidden max-w-[160px] px-4 py-3 md:table-cell">
+                        <div className="text-xs text-zinc-300">{order.delivery_address}</div>
                         {order.delivery_city && (
-                          <div className="text-xs text-gray-400">{order.delivery_city}, {order.delivery_zip}</div>
+                          <div className="text-xs text-zinc-600">{order.delivery_city}, {order.delivery_zip}</div>
                         )}
-                      </TableCell>
-                      <TableCell className="font-medium">{formatCurrency(foodTotal)}</TableCell>
-                      <TableCell className="hidden text-sm text-gray-500 sm:table-cell">
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 font-medium text-zinc-300">{formatCurrency(foodTotal)}</td>
+                      <td className="hidden whitespace-nowrap px-4 py-3 text-sm text-zinc-500 sm:table-cell">
                         {formatCurrency(order.delivery_fee ?? 0)}
-                      </TableCell>
-                      <TableCell className="font-medium">{formatCurrency(order.order_total)}</TableCell>
-                      <TableCell>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 font-medium text-zinc-300">{formatCurrency(order.order_total)}</td>
+                      <td className="px-4 py-3">
                         <DeliveryStatusBadge status={order.delivery_status ?? "awaiting_dispatch"} />
-                      </TableCell>
-                      <TableCell className="hidden text-sm text-gray-500 sm:table-cell">
+                      </td>
+                      <td className="hidden whitespace-nowrap px-4 py-3 text-sm text-zinc-500 sm:table-cell">
                         {formatTime(order.created_at)}
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td className="px-4 py-3">
                         {order.delivery_status === "awaiting_dispatch" ? (
-                          <Button
-                            variant="default"
-                            size="xs"
+                          <button
                             disabled={dispatchingId === order.id}
                             onClick={() => dispatchOrder(order.id)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            className="inline-flex items-center gap-1 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-orange-500 disabled:opacity-50"
                           >
                             {dispatchingId === order.id ? (
                               <Loader2 className="h-3 w-3 animate-spin" />
                             ) : (
                               <>
                                 <Truck className="h-3 w-3" />
-                                <span className="ml-1">Dispatch</span>
+                                <span>Dispatch</span>
                               </>
                             )}
-                          </Button>
+                          </button>
                         ) : order.delivery_status === "dispatched" ? (
-                          <span className="inline-flex items-center gap-1 text-xs text-blue-600 font-medium">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-400">
                             Dispatched &#10003;
                           </span>
                         ) : order.delivery_status === "in_transit" ? (
-                          <span className="inline-flex items-center gap-1 text-xs text-orange-600 font-medium">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-orange-400">
                             In Transit
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-xs text-green-600 font-medium">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-green-400">
                             Delivered &#10003;
                           </span>
                         )}
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   );
                 })
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

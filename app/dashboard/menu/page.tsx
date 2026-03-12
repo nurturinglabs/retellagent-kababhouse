@@ -42,9 +42,9 @@ const CATEGORIES = [
 ] as const;
 
 const DIETARY_BADGE_STYLES: Record<string, string> = {
-  halal: "bg-green-100 text-green-800 border-green-200",
-  vegetarian: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  vegan: "bg-lime-100 text-lime-800 border-lime-200",
+  halal: "bg-green-500/10 text-green-400 border-green-500/20",
+  vegetarian: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  vegan: "bg-lime-500/10 text-lime-400 border-lime-500/20",
 };
 
 const DIETARY_LABELS: Record<string, string> = {
@@ -145,8 +145,8 @@ export default function MenuManagementPage() {
     return (
       <div className="flex min-h-[400px] items-center justify-center p-6">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-[#c2571a] border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Loading menu...</p>
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
+          <p className="text-sm text-zinc-500">Loading menu...</p>
         </div>
       </div>
     );
@@ -156,10 +156,10 @@ export default function MenuManagementPage() {
     <div className="space-y-6 p-6">
       {/* Page Title */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-[#c2571a]">
+        <h1 className="text-3xl font-bold tracking-tight text-white">
           Menu Management
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-zinc-500">
           Manage menu item availability. Toggle items on or off for voice
           ordering.
         </p>
@@ -167,12 +167,12 @@ export default function MenuManagementPage() {
 
       {/* Category Tabs */}
       <Tabs defaultValue="plates" className="w-full">
-        <TabsList className="mb-4 w-full justify-start bg-amber-50">
+        <TabsList className="mb-4 w-full justify-start bg-white/[0.03] border border-white/[0.06]">
           {CATEGORIES.map((cat) => (
             <TabsTrigger
               key={cat.value}
               value={cat.value}
-              className="data-[state=active]:bg-[#c2571a] data-[state=active]:text-white"
+              className="text-zinc-400 data-[state=active]:bg-orange-600 data-[state=active]:text-white"
             >
               {cat.label}
               <span className="ml-1.5 text-xs opacity-70">
@@ -185,8 +185,8 @@ export default function MenuManagementPage() {
         {CATEGORIES.map((cat) => (
           <TabsContent key={cat.value} value={cat.value}>
             {(itemsByCategory[cat.value]?.length || 0) === 0 ? (
-              <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-dashed border-amber-200 bg-amber-50/50">
-                <p className="text-sm text-muted-foreground">
+              <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-dashed border-white/[0.06] bg-white/[0.02]">
+                <p className="text-sm text-zinc-500">
                   No items in this category.
                 </p>
               </div>
@@ -197,8 +197,8 @@ export default function MenuManagementPage() {
                     key={item.id}
                     className={`transition-all duration-200 ${
                       item.available
-                        ? "border-amber-100 bg-white"
-                        : "border-gray-200 bg-gray-50 opacity-70"
+                        ? "border-white/[0.06] bg-white/[0.02]"
+                        : "border-white/[0.04] bg-white/[0.01] opacity-70"
                     }`}
                   >
                     <CardHeader className="pb-3">
@@ -207,13 +207,13 @@ export default function MenuManagementPage() {
                           <CardTitle
                             className={`text-base ${
                               item.available
-                                ? "text-[#8B4513]"
-                                : "text-gray-400"
+                                ? "text-white"
+                                : "text-zinc-600"
                             }`}
                           >
                             {item.name}
                           </CardTitle>
-                          <CardDescription className="mt-1 text-lg font-semibold text-[#c2571a]">
+                          <CardDescription className="mt-1 text-lg font-semibold text-orange-400">
                             {fmtPrice(item.price)}
                           </CardDescription>
                         </div>
@@ -221,8 +221,8 @@ export default function MenuManagementPage() {
                           <span
                             className={`text-xs font-medium ${
                               item.available
-                                ? "text-green-600"
-                                : "text-gray-400"
+                                ? "text-green-400"
+                                : "text-zinc-600"
                             }`}
                           >
                             {item.available ? "Available" : "Unavailable"}
@@ -233,7 +233,7 @@ export default function MenuManagementPage() {
                               handleToggle(item.id, checked)
                             }
                             disabled={togglingIds.has(item.id)}
-                            className="data-[state=checked]:bg-[#c2571a]"
+                            className="data-[state=checked]:bg-orange-600"
                           />
                         </div>
                       </div>
@@ -243,8 +243,8 @@ export default function MenuManagementPage() {
                       <p
                         className={`line-clamp-2 text-sm ${
                           item.available
-                            ? "text-muted-foreground"
-                            : "text-gray-400"
+                            ? "text-zinc-400"
+                            : "text-zinc-600"
                         }`}
                       >
                         {item.description}
@@ -258,7 +258,7 @@ export default function MenuManagementPage() {
                               key={d}
                               className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${
                                 DIETARY_BADGE_STYLES[d] ||
-                                "bg-gray-100 text-gray-700 border-gray-200"
+                                "bg-white/[0.05] text-zinc-400 border-white/[0.08]"
                               }`}
                             >
                               {DIETARY_LABELS[d] || d}
