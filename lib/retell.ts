@@ -40,15 +40,22 @@ export function extractOrderFromTranscript(transcript: string): {
     return null;
   }
 
-  const lowerTranscript = transcript.toLowerCase();
+  // Extract only user utterances and agent confirmation/summary lines.
+  // This avoids false matches from menu descriptions the agent reads aloud
+  // (e.g. "comes with rice, hummus, and grilled veggies").
+  const orderRelevantText = extractOrderRelevantLines(transcript);
+  const lowerText = orderRelevantText.toLowerCase();
+
   const menuItems = getAllItems();
   const foundItems: { name: string; quantity: number }[] = [];
+  const seenIds = new Set<string>();
 
   for (const item of menuItems) {
     const itemNameLower = item.name.toLowerCase();
-    if (lowerTranscript.includes(itemNameLower)) {
-      const quantity = extractQuantityBefore(lowerTranscript, itemNameLower);
+    if (lowerText.includes(itemNameLower) && !seenIds.has(item.id)) {
+      const quantity = extractQuantityBefore(lowerText, itemNameLower);
       foundItems.push({ name: item.name, quantity });
+      seenIds.add(item.id);
     }
   }
 
@@ -63,6 +70,52 @@ export function extractOrderFromTranscript(transcript: string): {
     customerPhone: customerPhone || undefined,
     specialRequests: specialRequests || undefined,
   };
+}
+
+/**
+ * Pull out only the lines relevant for item extraction:
+ *  - All "User:" lines (what the customer actually asked for)
+ *  - Agent lines that are order confirmations / summaries
+ *    (contain phrases like "so that's", "to confirm", "your order", "your total")
+ *
+ * This prevents false matches from agent descriptions like
+ * "The Chicken Shawarma Plate comes with rice, hummus, and grilled veggies".
+ */
+function extractOrderRelevantLines(transcript: string): string {
+  const lines = transcript.split("\n");
+  const relevant: string[] = [];
+
+  const confirmationPatterns = [
+    /so that'?s/i,
+    /to confirm/i,
+    /your order/i,
+    /your total/i,
+    /we have/i,
+    /order is/i,
+    /order all set/i,
+    /so we have/i,
+    /just to confirm/i,
+  ];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    // Always include user lines
+    if (trimmed.startsWith("User:")) {
+      relevant.push(trimmed);
+      continue;
+    }
+
+    // Include agent lines only if they're confirmations/summaries
+    if (trimmed.startsWith("Agent:")) {
+      if (confirmationPatterns.some((p) => p.test(trimmed))) {
+        relevant.push(trimmed);
+      }
+    }
+  }
+
+  return relevant.join("\n");
 }
 
 /**
