@@ -1,5 +1,5 @@
 import Retell from "retell-sdk";
-import { getAllItems, getMenuItem } from "@/lib/menu";
+import { getAllItems, getMenuItem, ALIASES } from "@/lib/menu";
 
 /**
  * Verify that a webhook request actually came from Retell AI.
@@ -59,15 +59,17 @@ export function extractOrderFromTranscript(transcript: string): {
     }
   }
 
-  // 2. Alias-based matching: find spoken phrases in user lines that map
-  //    to menu items via getMenuItem (which handles aliases like
-  //    "large fries" → "Fries (Large)", "french fries" → "Fries (Small)")
-  const spokenPhrases = extractSpokenItemPhrases(orderRelevantText);
-  for (const phrase of spokenPhrases) {
-    const menuItem = getMenuItem(phrase.name);
-    if (menuItem && !seenIds.has(menuItem.id)) {
-      foundItems.push({ name: menuItem.name, quantity: phrase.quantity });
-      seenIds.add(menuItem.id);
+  // 2. Alias-based matching: scan the relevant text for every known alias
+  //    (e.g. "garlic sauce", "french fries", "chicken shirmer") and resolve
+  //    them to actual menu items via getMenuItem.
+  for (const aliasKey of Object.keys(ALIASES)) {
+    if (lowerText.includes(aliasKey)) {
+      const menuItem = getMenuItem(aliasKey);
+      if (menuItem && !seenIds.has(menuItem.id)) {
+        const quantity = extractQuantityBefore(lowerText, aliasKey);
+        foundItems.push({ name: menuItem.name, quantity });
+        seenIds.add(menuItem.id);
+      }
     }
   }
 
@@ -164,48 +166,6 @@ function extractOrderRelevantLines(transcript: string): string {
   }
 
   return relevant.join("\n");
-}
-
-/**
- * Extract likely item phrases from user lines for alias-based matching.
- * Looks for patterns like "one large fries", "a chicken shawarma", "french fries", etc.
- */
-function extractSpokenItemPhrases(
-  relevantText: string
-): { name: string; quantity: number }[] {
-  const results: { name: string; quantity: number }[] = [];
-
-  // Only process user lines
-  const userLines = relevantText
-    .split("\n")
-    .filter((l) => l.trim().startsWith("User:"))
-    .map((l) => l.replace(/^User:\s*/i, "").toLowerCase());
-
-  const text = userLines.join(" ");
-
-  // Match patterns like "one/two/1/2 <item phrase>" or bare item phrases
-  // Includes common mispronunciations picked up by speech-to-text
-  const quantityPattern =
-    /(?:(?:(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+)?)((?:large|small|big|french|mixed|side of|chicken|beef|lamb|veggie|vegetarian|falafel|arabi)\s+\w+(?:\s+\w+)?)/gi;
-
-  const numberWords: Record<string, number> = {
-    one: 1, two: 2, three: 3, four: 4, five: 5,
-    six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
-  };
-
-  let match;
-  while ((match = quantityPattern.exec(text)) !== null) {
-    const qtyStr = match[1]?.toLowerCase();
-    const itemPhrase = match[2].trim();
-    const quantity = qtyStr
-      ? /^\d+$/.test(qtyStr)
-        ? parseInt(qtyStr, 10)
-        : numberWords[qtyStr] || 1
-      : 1;
-    results.push({ name: itemPhrase, quantity });
-  }
-
-  return results;
 }
 
 /**

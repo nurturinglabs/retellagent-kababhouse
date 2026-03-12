@@ -360,7 +360,7 @@ export const MENU_ITEMS: Record<string, MenuItem[]> = {
 // Common spoken aliases → canonical menu item name or id.
 // Covers alternate spellings, abbreviations, and casual phrasing customers
 // are likely to use over the phone.
-const ALIASES: Record<string, string> = {
+export const ALIASES: Record<string, string> = {
   // ── Fries ───────────────────────────────────────────────────────────────
   "french fries": "fries (small)",
   "french fry": "fries (small)",
