@@ -97,19 +97,26 @@ function extractOrderRelevantLines(transcript: string): string {
   const lines = transcript.split("\n");
   const relevant: string[] = [];
 
-  // Only match agent lines that are definitive confirmations, not questions
-  const confirmationPatterns = [
-    /(?:so that'?s|to confirm|your order|your total|order all set|so we have|just to confirm).*(?:\.|!)/i,
+  const confirmationKeywords = [
+    /so that'?s/i,
+    /to confirm/i,
+    /your order/i,
+    /your total/i,
+    /order all set/i,
+    /so we have/i,
+    /just to confirm/i,
+    /order is all set/i,
+    /order'?s all set/i,
   ];
 
-  // Exclude agent lines that are questions or suggestions
-  const questionPatterns = [
-    /\?/,
+  // Lines that are purely questions/suggestions with no confirmation value
+  const pureQuestionPatterns = [
     /did you mean/i,
-    /was that/i,
+    /was that the/i,
     /would you like/i,
     /do you want/i,
     /how about/i,
+    /which one/i,
   ];
 
   for (const line of lines) {
@@ -122,12 +129,36 @@ function extractOrderRelevantLines(transcript: string): string {
       continue;
     }
 
-    // Include agent lines only if they're definitive confirmations (not questions)
+    // For agent lines: include confirmations, but strip trailing questions
     if (trimmed.startsWith("Agent:")) {
-      const isConfirmation = confirmationPatterns.some((p) => p.test(trimmed));
-      const isQuestion = questionPatterns.some((p) => p.test(trimmed));
-      if (isConfirmation && !isQuestion) {
-        relevant.push(trimmed);
+      // Skip lines that are purely questions/suggestions
+      if (pureQuestionPatterns.some((p) => p.test(trimmed))) {
+        continue;
+      }
+
+      const isConfirmation = confirmationKeywords.some((p) => p.test(trimmed));
+      if (isConfirmation) {
+        // If the line also contains a trailing question, keep only
+        // the text before the last "?" to avoid question-only fragments
+        // e.g. "Just to confirm: Chicken Plate, Fries. Does that work?"
+        //    → "Just to confirm: Chicken Plate, Fries."
+        const lastQ = trimmed.lastIndexOf("?");
+        if (lastQ > 0) {
+          // Find the start of the trailing question sentence
+          const beforeQ = trimmed.substring(0, lastQ);
+          const lastSentenceEnd = Math.max(
+            beforeQ.lastIndexOf("."),
+            beforeQ.lastIndexOf("!")
+          );
+          if (lastSentenceEnd > 0) {
+            relevant.push(trimmed.substring(0, lastSentenceEnd + 1));
+          } else {
+            // No sentence boundary found — include the whole thing up to "?"
+            relevant.push(beforeQ);
+          }
+        } else {
+          relevant.push(trimmed);
+        }
       }
     }
   }
@@ -153,8 +184,9 @@ function extractSpokenItemPhrases(
   const text = userLines.join(" ");
 
   // Match patterns like "one/two/1/2 <item phrase>" or bare item phrases
+  // Includes common mispronunciations picked up by speech-to-text
   const quantityPattern =
-    /(?:(?:(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+)?)((?:large|small|big|french|mixed|side of|chicken|beef|lamb|veggie|vegetarian|falafel)\s+\w+(?:\s+\w+)?)/gi;
+    /(?:(?:(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+)?)((?:large|small|big|french|mixed|side of|chicken|beef|lamb|veggie|vegetarian|falafel|arabi)\s+\w+(?:\s+\w+)?)/gi;
 
   const numberWords: Record<string, number> = {
     one: 1, two: 2, three: 3, four: 4, five: 5,
