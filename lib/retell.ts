@@ -367,41 +367,106 @@ function extractQuantityBefore(
 }
 
 function extractCustomerName(transcript: string): string | null {
-  // Words that commonly follow "I'm" / "this is" but aren't names
-  const falsePositives = new Set([
-    "here", "ready", "looking", "calling", "interested", "trying",
-    "going", "just", "also", "not", "good", "fine", "done", "back",
-    "waiting", "ordering", "wondering", "sure", "sorry", "happy",
-  ]);
+  // Strategy: prioritize the agent's confirmation of the name (most reliable),
+  // then fall back to user self-identification patterns.
+  // Only search user lines for self-ID and agent lines for confirmations
+  // to avoid false matches from agent greetings / descriptions.
 
-  const patterns = [
-    /(?:my name is|name's|this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
-    /(?:under the name|for)\s+([A-Z][a-z]+)/i,
+  const lines = transcript.split("\n");
+  const userLines = lines.filter((l) => l.trim().startsWith("User:")).join("\n");
+  const agentLines = lines.filter((l) => l.trim().startsWith("Agent:")).join("\n");
+
+  // 1. Best signal: agent addressing user by name in confirmation
+  //    e.g. "Great, Even!" or "Thanks Anthony!" or "Got it, Mark!"
+  const agentNamePatterns = [
+    /(?:Great|Thanks|Thank you|Awesome|Got it|Perfect),?\s+([A-Z][a-z]+)[!.]/gi,
+    /under the name\s+([A-Z][a-z]+)/gi,
+    /(?:Can I get your name|what's your name|your name)\b.*?\n\s*(?:User:\s*)([A-Z][a-z]+)/gi,
   ];
 
-  for (const pattern of patterns) {
-    const match = transcript.match(pattern);
-    if (match && match[1]) {
-      const candidate = match[1].trim();
-      if (falsePositives.has(candidate.toLowerCase().split(/\s+/)[0])) {
-        continue; // skip "here to", "looking for", etc.
+  // Collect all agent-confirmed name candidates and pick the most frequent
+  const agentCandidates: string[] = [];
+  for (const pattern of agentNamePatterns) {
+    let m;
+    while ((m = pattern.exec(agentLines)) !== null) {
+      const candidate = m[1].trim();
+      if (isPlausibleName(candidate)) {
+        agentCandidates.push(candidate);
       }
-      return candidate;
     }
   }
 
-  // Fallback: look for agent addressing user by name in confirmation
-  // e.g. "Great, Even!" or "Thanks Anthony!"
-  const agentNamePattern = /(?:Great|Thanks|Thank you|Awesome),?\s+([A-Z][a-z]+)!/i;
-  const agentMatch = transcript.match(agentNamePattern);
-  if (agentMatch && agentMatch[1]) {
-    const candidate = agentMatch[1].trim();
-    if (!falsePositives.has(candidate.toLowerCase())) {
-      return candidate;
+  if (agentCandidates.length > 0) {
+    // Return the most frequently mentioned name
+    const freq = new Map<string, number>();
+    for (const c of agentCandidates) {
+      freq.set(c, (freq.get(c) || 0) + 1);
+    }
+    return [...freq.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  }
+
+  // 2. Context-based: find where agent asks for the name, then grab the
+  //    user's next response. Handles cases where user just says "Mark." or "Anthony."
+  const trimmedLines = lines.map((l) => l.trim());
+  const namePromptPatterns = [
+    /your name/i,
+    /can i get (?:a|your) name/i,
+    /what(?:'s| is) your name/i,
+    /who(?:'s| is) this/i,
+    /name (?:for|on) the order/i,
+  ];
+
+  for (let i = 0; i < trimmedLines.length; i++) {
+    if (trimmedLines[i].startsWith("Agent:") &&
+        namePromptPatterns.some((p) => p.test(trimmedLines[i]))) {
+      // Look at the next user line(s) after this agent prompt
+      for (let j = i + 1; j < trimmedLines.length && j <= i + 3; j++) {
+        if (trimmedLines[j].startsWith("User:")) {
+          const response = trimmedLines[j].replace(/^User:\s*/i, "").trim();
+          // Extract first capitalized word(s) — the name
+          const nameMatch = response.match(/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/);
+          if (nameMatch && isPlausibleName(nameMatch[1])) {
+            return nameMatch[1];
+          }
+          // Also try if the whole response is just a word (lowercase from STT)
+          const singleWord = response.replace(/[.!?,]/g, "").trim();
+          if (/^[a-zA-Z]+$/.test(singleWord) && singleWord.length >= 2 &&
+              singleWord.length <= 20 && isPlausibleName(singleWord)) {
+            return singleWord.charAt(0).toUpperCase() + singleWord.slice(1);
+          }
+        }
+        // Stop if agent speaks again (name window is over)
+        if (trimmedLines[j].startsWith("Agent:")) break;
+      }
+    }
+  }
+
+  // 3. Fallback: user self-identification in user lines only
+  const userPatterns = [
+    /(?:my name is|name's|this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
+  ];
+
+  for (const pattern of userPatterns) {
+    const match = userLines.match(pattern);
+    if (match && match[1]) {
+      const candidate = match[1].trim();
+      if (isPlausibleName(candidate)) return candidate;
     }
   }
 
   return null;
+}
+
+/** Check if a word looks like a real name (not a common English word). */
+function isPlausibleName(word: string): boolean {
+  const notNames = new Set([
+    "here", "ready", "looking", "calling", "interested", "trying",
+    "going", "just", "also", "not", "good", "fine", "done", "back",
+    "waiting", "ordering", "wondering", "sure", "sorry", "happy",
+    "authentic", "middle", "eastern", "welcome", "home", "today",
+    "perfect", "great", "awesome", "right", "pickup", "delivery",
+  ]);
+  return !notNames.has(word.toLowerCase().split(/\s+/)[0]);
 }
 
 function extractPhoneNumber(transcript: string): string | null {
