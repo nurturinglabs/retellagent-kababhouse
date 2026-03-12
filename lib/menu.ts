@@ -399,12 +399,8 @@ export const ALIASES: Record<string, string> = {
   "chicken shawerma": "chicken shawarma plate",
   "beef shawirma": "beef shawarma plate",
   "chicken shawirma": "chicken shawarma plate",
-  "shawarma plate": "chicken shawarma plate",
-  "shawarma sandwich": "chicken shawarma sandwich",
-  "sharma plate": "chicken shawarma plate",
-  "sharma sandwich": "chicken shawarma sandwich",
-  "shirmer plate": "chicken shawarma plate",
-  "shirmer sandwich": "chicken shawarma sandwich",
+  // NOTE: no bare "shawarma plate" / "shawarma sandwich" alias — too ambiguous
+  // when the transcript already specifies "beef shawarma plate" etc.
   "arabi shawarma": "arabi beef shawarma plate",
   "arabi beef": "arabi beef shawarma plate",
   "arabi beef shawarma": "arabi beef shawarma plate",

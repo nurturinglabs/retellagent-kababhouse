@@ -49,13 +49,31 @@ export function extractOrderFromTranscript(transcript: string): {
   const foundItems: { name: string; quantity: number }[] = [];
   const seenIds = new Set<string>();
 
+  // Helper: derive a "family" key from a menu item id so that protein
+  // variants and size variants don't both match.
+  // e.g. "beef-shawarma-plate" → "shawarma-plate"
+  //      "chicken-shawarma-plate" → "shawarma-plate"
+  //      "fries-small" → "fries"
+  function familyKey(id: string): string {
+    return id
+      .replace(/^(beef|chicken|lamb|arabi)-/, "")
+      .replace(/-(small|large|side|\d+)$/, "");
+  }
+
+  // Track item "families" so e.g. matching "Beef Shawarma Plate" blocks
+  // "Chicken Shawarma Plate", and "large fries" blocks "small fries".
+  const seenFamilies = new Set<string>();
+
   // 1. Direct menu name matching against relevant transcript text
   for (const item of menuItems) {
     const itemNameLower = item.name.toLowerCase();
     if (lowerText.includes(itemNameLower) && !seenIds.has(item.id)) {
+      const family = familyKey(item.id);
+      if (seenFamilies.has(family)) continue;
       const quantity = extractQuantityBefore(lowerText, itemNameLower);
       foundItems.push({ name: item.name, quantity });
       seenIds.add(item.id);
+      seenFamilies.add(family);
     }
   }
 
@@ -66,15 +84,12 @@ export function extractOrderFromTranscript(transcript: string): {
   const sortedAliases = Object.keys(ALIASES).sort(
     (a, b) => b.length - a.length
   );
-  // Track item "families" so e.g. matching "large fries" blocks "small fries"
-  const seenFamilies = new Set<string>();
   for (const aliasKey of sortedAliases) {
     if (lowerText.includes(aliasKey)) {
       const menuItem = getMenuItem(aliasKey);
       if (menuItem && !seenIds.has(menuItem.id)) {
-        // Derive family key: "fries-small" → "fries", "fries-large" → "fries"
-        const family = menuItem.id.replace(/-(small|large|side|\d+)$/, "");
-        if (seenFamilies.has(family)) continue; // skip size variants
+        const family = familyKey(menuItem.id);
+        if (seenFamilies.has(family)) continue; // skip variants
         const quantity = extractQuantityBefore(lowerText, aliasKey);
         foundItems.push({ name: menuItem.name, quantity });
         seenIds.add(menuItem.id);
